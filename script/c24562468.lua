@@ -8,16 +8,25 @@ function c24562468.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCountLimit(1,24562468)
-	e1:SetCondition(c24562468.condition)
-	e1:SetTarget(c24562468.target)
-	e1:SetOperation(c24562468.operation)
+	e1:SetCondition(c24562468.e1con)
+	e1:SetTarget(c24562468.e1tg)
+	e1:SetOperation(c24562468.e1op)
 	c:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e2:SetCountLimit(1)
+	e2:SetValue(c24562468.ind2)
+	c:RegisterEffect(e2)
 end
-function c24562468.condition(e,tp,eg,ep,ev,re,r,rp)
-	local at=Duel.GetAttacker()
-	return at:GetControler()~=tp and Duel.GetAttackTarget()==nil
+function c24562468.ind2(e,c)
+	return c:GetLevel()==0 or c:IsLevelBelow(1)
 end
-function c24562468.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c24562468.e1con(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetMatchingGroupCount(c24562468.e1fil,tp,0,LOCATION_ONFIELD,nil)<=0 then return false end
+	return tp~=Duel.GetTurnPlayer()
+end
+function c24562468.e1tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local at=Duel.GetAttacker()
 	local c=e:GetHandler()
 	if chkc then return chkc==at end
@@ -27,27 +36,15 @@ function c24562468.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetTargetCard(at)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
-function c24562468.operation(e,tp,eg,ep,ev,re,r,rp)
+function c24562468.e1op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if Duel.NegateAttack() then
-	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
-	if Duel.GetMatchingGroupCount(c24562468.fil1,tp,0,LOCATION_ONFIELD,nil)>0 then
-		Duel.NegateRelatedChain(tc,RESET_TURN_SET)
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_DISABLE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		tc:RegisterEffect(e1)
-		local e2=e1:Clone()
-		e2:SetCode(EFFECT_DISABLE_EFFECT)
-		e2:SetValue(RESET_TURN_SET)
-		tc:RegisterEffect(e2)
-		Duel.AdjustInstantly(tc)
-	end
+	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) then
+	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 	end
 	end
 end
-function c24562468.fil1(c)
-	return c:IsSetCard(0x1390) and c:IsFaceup()
+function c24562468.e1fil(c)
+	return c:IsSetCard(0x9390) and c:IsFaceup()
 end

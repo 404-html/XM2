@@ -13,7 +13,7 @@ function c24562460.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c24562460.e3cfil(c)
-	return c:IsSetCard(0x1390) and c:IsAbleToRemoveAsCost()
+	return c:IsSetCard(0x9390) and c:IsAbleToRemoveAsCost()
 end
 function c24562460.e3cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -39,6 +39,7 @@ function c24562460.e3op(e,tp,eg,ep,ev,re,r,rp)
 	  e2:SetCategory(CATEGORY_DAMAGE)
 	  e2:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	  e2:SetRange(LOCATION_ONFIELD)
+	  e2:SetProperty(EFFECT_FLAG_CLIENT_HINT)
 	  e2:SetCountLimit(1)
 	  e2:SetCondition(c24562460.e2damcon)
 	  e2:SetTarget(c24562460.e2damtg)
@@ -61,5 +62,5 @@ function c24562460.e2damcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp
 end
 function c24562460.matfilter(c)
-	return c:IsLinkSetCard(0x1390) and not c:IsLinkCode(24562460)
+	return c:IsLinkSetCard(0x9390) and not c:IsLinkCode(24562460)
 end

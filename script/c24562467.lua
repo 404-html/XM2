@@ -49,7 +49,7 @@ function c24562467.e3con(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetEquipTarget()==eg:GetFirst()
 end
 function c24562467.e4fil(c,e,tp)
-	return c:IsSetCard(0x1390) and c:IsType(TYPE_MONSTER)
+	return c:IsSetCard(0x9390) and c:IsType(TYPE_MONSTER)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c24562467.e4tg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -78,7 +78,7 @@ function c24562467.e4op(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c24562467.eqlimit(e,c)
-	return c:IsSetCard(0x1390)
+	return c:IsSetCard(0x9390)
 end
 function c24562467.filter0(c)
 	return c:IsOnField() and c:IsAbleToRemove()
@@ -87,7 +87,7 @@ function c24562467.filter1(c,e)
 	return c:IsOnField() and c:IsAbleToRemove() and not c:IsImmuneToEffect(e)
 end
 function c24562467.filter2(c,e,tp,m,f,chkf)
-	return c:IsType(TYPE_FUSION) and c:IsSetCard(0x1390) and (not f or f(c))
+	return c:IsType(TYPE_FUSION) and c:IsSetCard(0x9390) and (not f or f(c))
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) and c:CheckFusionMaterial(m,cv,chkf)
 end
 function c24562467.filter3(c)
@@ -166,7 +166,7 @@ function c24562467.e3op(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c24562467.ttfil(c)
-	return c:IsReleasable() and c:IsFaceup() and c:IsSetCard(0x1390)
+	return c:IsReleasable() and c:IsFaceup() and c:IsSetCard(0x9390)
 end
 function c24562467.ttcon(e,c)
 	return Duel.GetMatchingGroupCount(c24562467.ttfil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)>0

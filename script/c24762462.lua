@@ -1,22 +1,19 @@
 --猛毒性 淤垢
 function c24762462.initial_effect(c)
-	aux.AddXyzProcedure(c,nil,3,2,c24762462.ovfilter,aux.Stringid(24762462,0),2,c24762462.xyzop)
+	c:EnableReviveLimit()
+	aux.AddFusionProcCodeFun(c,24762461,aux.FilterBoolFunction(Card.IsSetCard,0x9390),1,false,false)
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetDescription(aux.Stringid(24762463,1))
-	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(1,2476246300)
-	e1:SetCondition(c24762462.e1con)
-	e1:SetCost(c24762462.e1cost)
-	e1:SetTarget(c24762462.e1tg)
-	e1:SetOperation(c24762462.e1op)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e1:SetValue(c24762462.splimit)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(24762463,3))
+	e2:SetDescription(aux.Stringid(24762462,0))
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e2:SetRange(LOCATION_ONFIELD)
 	e2:SetCode(EVENT_PHASE+PHASE_STANDBY)
+	e2:SetProperty(EFFECT_FLAG_CLIENT_HINT)
 	e2:SetCountLimit(1)
 	e2:SetCondition(c24762462.e2con)
 	e2:SetTarget(c24762462.e2tg)
@@ -30,10 +27,49 @@ function c24762462.initial_effect(c)
 	e3:SetCondition(c24762462.e3repcon)
 	e3:SetOperation(c24762462.e3repop)
 	c:RegisterEffect(e3)
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_FIELD)
+	e4:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+	e4:SetCode(EFFECT_SPSUMMON_PROC)
+	e4:SetRange(LOCATION_EXTRA)
+	e4:SetCondition(c24762462.hspcon)
+	e4:SetOperation(c24762462.hspop)
+	c:RegisterEffect(e4)
 end
-function c24762462.e1con(e)
-	local tp=e:GetHandler():GetControler()
-	return Duel.IsExistingMatchingCard(c24762462.e1fil,tp,LOCATION_REMOVED,0,1,nil,e,tp)
+function c24762462.spfil(c)
+	return c:IsCanBeFusionMaterial() and c:IsSetCard(0x9390) and c:IsAbleToRemoveAsCost()
+end
+function c24762462.fselect(c,tp,mg,sg)
+	sg:AddCard(c)
+	local res=false
+	if sg:GetCount()<1 then
+		res=mg:IsExists(c24762462.fselect,1,sg,tp,mg,sg)
+	else
+		res=Duel.GetLocationCountFromEx(tp,tp,sg)>0
+	end
+	sg:RemoveCard(c)
+	return res
+end
+function c24762462.hspcon(e,c)
+	if c==nil then return true end
+	local tp=c:GetControler()
+	local mg=Duel.GetMatchingGroup(c24762462.spfil,tp,LOCATION_MZONE+LOCATION_GRAVE,0,nil)
+	local sg=Group.CreateGroup()
+	return Duel.GetFlagEffect(tp,24762462)==0 and mg:IsExists(c24762462.fselect,1,nil,tp,mg,sg)
+end
+function c24762462.hspop(e,tp,eg,ep,ev,re,r,rp,c)
+	local mg=Duel.GetMatchingGroup(c24762462.spfil,tp,LOCATION_MZONE+LOCATION_GRAVE,0,nil)
+	local sg=Group.CreateGroup()
+	while sg:GetCount()<1 do
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+		local g=mg:FilterSelect(tp,c24762462.fselect,1,2,sg,tp,mg,sg)
+		sg:Merge(g)
+	Duel.Remove(sg,POS_FACEUP,REASON_COST+REASON_FUSION+REASON_MATERIAL)
+	end
+	Duel.RegisterFlagEffect(tp,24762462,RESET_PHASE+PHASE_END,0,1)
+end
+function c24762462.splimit(e,se,sp,st)
+	return not e:GetHandler():IsLocation(LOCATION_EXTRA) or bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION or se:GetHandler():IsCode(24562458)
 end
 function c24762462.e2con(e)
 	local tp=e:GetHandler():GetControler()
@@ -41,14 +77,14 @@ function c24762462.e2con(e)
 end
 function c24762462.e3repcon(e)
 	local c=e:GetHandler()
-	return c:GetOverlayGroup():IsExists(Card.IsSetCard,1,nil,0x1390) and c:IsPreviousLocation(LOCATION_MZONE)
+	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsSummonType(SUMMON_TYPE_FUSION)
 end
 function c24762462.e3repop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	local tc=e:GetHandler()
 	Duel.MoveToField(tc,tp,1-tp,LOCATION_SZONE,POS_FACEUP,true)
 	local e11=Effect.CreateEffect(tc)
-	e11:SetDescription(aux.Stringid(24762462,3))
+	e11:SetDescription(aux.Stringid(24762462,1))
 	e11:SetCode(EFFECT_CHANGE_TYPE)
 	e11:SetType(EFFECT_TYPE_SINGLE)
 	e11:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
@@ -87,56 +123,5 @@ function c24762462.e3rmfil(c)
 	return c:IsFaceup() and c:IsCode(24762461)
 end
 function c24762462.e2rcfil(c)
-	return c:IsFaceup() and c:IsSetCard(0x1390) and c:IsType(TYPE_MONSTER)
-end
-function c24762462.e1fil(c,e,tp)
-	return c:IsFaceup() and c:IsSetCard(0x1390) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
-function c24762462.e1tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and c24762462.e1fil(chkc,e,tp) end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
-	local g=Duel.IsExistingMatchingCard(c24762462.e1fil,tp,LOCATION_REMOVED,0,1,nil,e,tp)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
-end
-function c24762462.e1op(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.IsExistingMatchingCard(c24762462.e1fil,tp,LOCATION_REMOVED,0,1,nil,e,tp) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c24762462.e1fil,tp,LOCATION_REMOVED,0,1,1,nil,e,tp)
-	local tc=g:GetFirst()
-	Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
-	end
-end
-function c24762462.e1cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) and (ft>0 and Duel.IsExistingMatchingCard(c24762462.e1cosfil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) or Duel.IsExistingMatchingCard(c24762462.mmzfil,tp,LOCATION_MZONE,0,1,nil))
-	end
-	if ft>0 then
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	 local g1=Duel.SelectMatchingCard(tp,c24762462.e1cosfil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
-	 Duel.Release(g1,REASON_COST)
-	  else 
-		 Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-		 local g2=Duel.SelectMatchingCard(tp,c24762462.mmzfil,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
-		 Duel.Release(g2,REASON_COST)
-	end
-	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
-end
-function c24762462.mmzfil(c)
-	return c:IsSetCard(0x1390) and c:IsFaceup() and c:IsReleasable() and c:GetSequence()<5
-end
-function c24762462.e1cosfil(c)
-	return c:IsSetCard(0x1390) and c:IsFaceup() and c:IsReleasable()
-end
-function c24762462.ovfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x1390) and not c:IsCode(24762462)
-end
-function c24762462.xyzop(e,tp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,24762462)==0 and Duel.IsExistingMatchingCard(c24762462.spfil,tp,LOCATION_GRAVE,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,c24762462.spfil,tp,LOCATION_GRAVE,0,1,1,nil)
-	Duel.Remove(g,POS_FACEUP,REASON_COST)
-	Duel.RegisterFlagEffect(tp,24762462,RESET_PHASE+PHASE_END,0,1)
-end
-function c24762462.spfil(c)
-	return c:IsAbleToRemoveAsCost() and c:IsSetCard(0x1390)
+	return c:IsFaceup() and c:IsSetCard(0x9390) and c:IsType(TYPE_MONSTER)
 end

@@ -91,10 +91,11 @@ function c33350005.tkop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c33350005.rdcon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
-	return ep==tp and tc.setname=="TaleSouls" and tc:GetBattleTarget()~=nil
+	local tc2=tc:GetBattleTarget()
+	return ep==tp and tc2.setname=="TaleSouls" and tc:IsAttackPos()
 end
 function c33350005.rdop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ChangeBattleDamage(tp,ev/2)
+	Duel.ChangeBattleDamage(ep,ev/2)
 end
 function c33350005.filter(c)
 	return c.setname=="TaleSouls" and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()

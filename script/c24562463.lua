@@ -21,7 +21,7 @@ end
 function c24562463.e2op(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local g=Duel.SelectMatchingCard(tp,c24562463.e2fil,tp,LOCATION_DECK+LOCATION_REMOVED,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,c24562463.e2fil,tp,LOCATION_REMOVED,0,1,1,nil)
 	local tc=g:GetFirst()
 	if tc then
 		Duel.SSet(tp,tc)
@@ -29,11 +29,11 @@ function c24562463.e2op(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c24562463.e2fil(c)
-	return c:IsSetCard(0x1390) and c:IsType(TYPE_SPELL) and c:IsSSetable()
+	return c:IsSetCard(0x9390) and c:IsType(TYPE_SPELL) and c:IsSSetable() and c:IsFaceup()
 end
 function c24562463.e2tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingMatchingCard(c24562463.e2fil,tp,LOCATION_DECK+LOCATION_REMOVED,0,1,nil) end
+		and Duel.IsExistingMatchingCard(c24562463.e2fil,tp,LOCATION_REMOVED,0,1,nil) end
 end
 function c24562463.e1op(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
@@ -64,5 +64,5 @@ function c24562463.e1cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoGrave(g,REASON_COST)
 end
 function c24562463.e1cfil(c)
-	return c:IsSetCard(0x1390) and c:IsType(TYPE_MONSTER) and c:IsAbleToGraveAsCost()
+	return c:IsSetCard(0x9390) and c:IsType(TYPE_MONSTER) and c:IsAbleToGraveAsCost()
 end

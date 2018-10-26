@@ -1,7 +1,7 @@
 --猛毒性 喘鸣
 function c24762459.initial_effect(c)
 	c:EnableReviveLimit()
-	aux.AddFusionProcCodeFun(c,24562460,aux.FilterBoolFunction(Card.IsSetCard,0x1390),1,false,false)
+	aux.AddFusionProcCodeFun(c,24562460,aux.FilterBoolFunction(Card.IsSetCard,0x9390),1,false,false)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
@@ -35,7 +35,7 @@ function c24762459.splimit(e,se,sp,st)
 	return not e:GetHandler():IsLocation(LOCATION_EXTRA) or bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION or se:GetHandler():IsCode(24562458)
 end
 function c24762459.con(e,tp,eg,ep,ev,re,r,rp)
-	if bit.band(r,REASON_EFFECT)~=0 then return re and re:GetHandler():GetCode()~=24762459 and re:GetHandler():IsSetCard(0x1390) end
+	if bit.band(r,REASON_EFFECT)~=0 then return re and re:GetHandler():GetCode()~=24762459 and re:GetHandler():IsSetCard(0x9390) end
 	return ep~=tp
 end
 function c24762459.tg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -62,7 +62,7 @@ function c24762459.e3destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
 function c24762459.e3costfil(c)
-	return c:IsAbleToRemove() and c:IsSetCard(0x1390) and c:IsFaceup()
+	return c:IsAbleToRemove() and c:IsSetCard(0x9390) and c:IsFaceup()
 end
 function c24762459.e3cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

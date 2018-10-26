@@ -17,51 +17,70 @@ function c24762460.initial_effect(c)
 	e1:SetCondition(c24762460.dircon)
 	c:RegisterEffect(e1)
 	local e3=Effect.CreateEffect(c)
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e3:SetDescription(aux.Stringid(24762460,1))
+	e3:SetCategory(CATEGORY_TOHAND)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetCode(EVENT_FREE_CHAIN)
-	e3:SetRange(LOCATION_GRAVE)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1,24762460)
-	e3:SetCost(c24762460.spcost)
-	e3:SetTarget(c24762460.sptg)
-	e3:SetOperation(c24762460.spop)
+	e3:SetTarget(c24762460.rmtg)
+	e3:SetOperation(c24762460.rmop)
 	c:RegisterEffect(e3)
 end
-function c24762460.e1cosfil(c)
-	return c:IsSetCard(0x1390) and c:IsFaceup() and c:IsReleasable()
+function c24762460.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsAbleToHand() end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToHand,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler()) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
+	local g=Duel.SelectTarget(tp,Card.IsAbleToHand,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,e:GetHandler())
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
 end
-function c24762460.mmzfil(c)
-	return c:IsSetCard(0x1390) and c:IsFaceup() and c:IsReleasable() and c:GetSequence()<5
-end
-function c24762460.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if chk==0 then return e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP) and (ft>0 or Duel.IsExistingMatchingCard(c24762460.mmzfil,tp,LOCATION_MZONE,0,1,nil)) and Duel.IsExistingMatchingCard(c24762460.e1cosfil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,3,nil)
-	end
-	local g=nil
-	if ft>0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-		g=Duel.SelectMatchingCard(tp,c24762460.e1cosfil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,3,3,nil)
-	elseif ft>-2 then
-		local ct=-ft+1
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-		g=Duel.SelectMatchingCard(tp,c24762460.mmzfil,tp,LOCATION_MZONE,LOCATION_MZONE,ct,ct,nil)
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-		local g2=Duel.SelectMatchingCard(tp,c24762460.e1cosfil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,3-ct,3-ct,g)
-		g:Merge(g2)
-	else
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-		g=Duel.SelectMatchingCard(tp,c24762460.mmzfil,tp,LOCATION_MZONE,LOCATION_MZONE,3,3,nil)
-	end
-	Duel.Release(g,REASON_COST)
-end
-function c24762460.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
-end
-function c24762460.spop(e,tp,eg,ep,ev,re,r,rp)
+function c24762460.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
-	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	local tc=Duel.GetFirstTarget()
+	if tc and tc:IsRelateToEffect(e) then
+	if Duel.SendtoHand(tc,nil,REASON_EFFECT+REASON_TEMPORARY)~=0 then
+		local og=Duel.GetOperatedGroup()
+		local oc=og:GetFirst()
+		if oc then
+		oc:RegisterFlagEffect(24762460,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_STANDBY+RESET_OPPO_TURN,0,1)
+		end
+		og:KeepAlive()
+		local e1=Effect.CreateEffect(c)
+		e1:SetDescription(aux.Stringid(24762460,2))
+		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
+		e1:SetReset(RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN)
+		e1:SetCountLimit(1)
+		e1:SetLabelObject(og)
+		e1:SetCondition(c24762460.retcon)
+		e1:SetOperation(c24762460.retop)
+		Duel.RegisterEffect(e1,tp)
+	end
+	end
+end
+function c24762460.retfilter(c)
+	return c:GetFlagEffect(24762460)~=0
+end
+function c24762460.retcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
+function c24762460.retop(e,tp,eg,ep,ev,re,r,rp)
+	local g=e:GetLabelObject()
+	local sg=g:Filter(c24762460.retfilter,nil)
+	if sg:GetCount()>1 and sg:GetClassCount(Card.GetPreviousControler)==1 then
+		local ft=Duel.GetLocationCount(sg:GetFirst():GetPreviousControler(),LOCATION_MZONE)
+		if ft==1 then
+			Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(24762460,2))
+			local tc=sg:Select(tp,1,1,nil):GetFirst()
+			Duel.ReturnToField(tc)
+			sg:RemoveCard(tc)
+		end
+	end
+	local tc=sg:GetFirst()
+	while tc do
+		Duel.ReturnToField(tc)
+		tc=sg:GetNext()
 	end
 end
 function c24762460.dircon(e)
@@ -100,5 +119,5 @@ function c24762460.seqop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c24762460.lcheck(g,lc)
-	return g:IsExists(Card.IsSetCard,1,nil,0x1390)
+	return g:IsExists(Card.IsSetCard,1,nil,0x9390)
 end

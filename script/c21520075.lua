@@ -54,6 +54,7 @@ function c21520075.activate(e,tp,eg,ep,ev,re,r,rp)
 		local sg=g:Select(tp,1,1,nil)
 		if Duel.SendtoHand(sg,nil,REASON_EFFECT)>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.SelectYesNo(tp,aux.Stringid(21520075,1))
 			and Duel.IsExistingMatchingCard(c21520075.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp,code1,code2) then
+			Duel.ConfirmCards(1-tp,sg)
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 			local spg=Duel.SelectMatchingCard(tp,c21520075.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp,code1,code2)
 			Duel.SpecialSummon(spg,0,tp,tp,false,false,POS_FACEUP)

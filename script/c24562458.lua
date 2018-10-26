@@ -90,7 +90,7 @@ function c24562458.e4op(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c24562458.e4filter(c)
-	return c:IsSetCard(0x1390) and c:GetType()==TYPE_SPELL+TYPE_QUICKPLAY and c:IsAbleToHand()
+	return c:IsSetCard(0x9390) and c:GetType()==TYPE_SPELL+TYPE_QUICKPLAY and c:IsAbleToHand()
 end
 function c24562458.e4tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c24562458.e4filter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
@@ -112,13 +112,13 @@ function c24562458.e3flag(e,tp,eg,ep,ev,re,r,rp)
 	e:GetHandler():GetEquipTarget():RegisterFlagEffect(24562458,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c24562458.e9limit(e,c)
-	return c:IsSetCard(0x1390)
+	return c:IsSetCard(0x9390)
 end
 function c24562458.e2val(e,c)
 	return Duel.GetFieldGroupCount(c:GetControler(),0,LOCATION_MZONE)*700
 end
 function c24562458.e1fl(c)
-	return c:IsFaceup() and c:IsSetCard(0x1390)
+	return c:IsFaceup() and c:IsSetCard(0x9390)
 end
 function c24562458.e1tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c24562458.e1fl(chkc) end

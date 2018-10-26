@@ -56,7 +56,7 @@ function c33350012.con2(e,tp,eg,ep,ev,re,r,rp)
 end
 function c33350012.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and c:IsFaceup() then
+	if c:IsFaceup() then
 		local atk=c:GetBaseAttack()+e:GetLabel()
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)

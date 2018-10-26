@@ -28,7 +28,7 @@ function c33350007.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local rg=Duel.SelectMatchingCard(tp,c33350007.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 	e:SetLabel(rg:GetFirst():GetAttack())
-	Duel.Remove(rg,POS_FACEUP,REASON_EFFECT)
+	Duel.Remove(rg,POS_FACEUP,REASON_COST)
 end
 function c33350007.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

@@ -53,7 +53,7 @@ function c24562471.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c24562471.fil1(c,e,tp)
 	local tp=e:GetHandler():GetControler()
-	return c:IsFaceup() and Duel.IsPlayerCanSpecialSummonMonster(tp,24562464,0x1390,TYPE_NORMAL,700,700,1,RACE_ROCK,ATTRIBUTE_EARTH,POS_FACEUP_ATTACK,1-tp) and not c:IsFusionType(TYPE_MONSTER)
+	return c:IsFaceup() and Duel.IsPlayerCanSpecialSummonMonster(tp,24562464,0x9390,TYPE_NORMAL,700,700,1,RACE_ROCK,ATTRIBUTE_EARTH,POS_FACEUP_ATTACK,1-tp) and not c:IsFusionType(TYPE_MONSTER)
 end
 function c24562471.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

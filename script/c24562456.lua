@@ -23,7 +23,7 @@ function c24562456.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c24562456.filter(c)
-	return c:IsSetCard(0x1390) and c:IsType(TYPE_SPELL) and c:IsSSetable()
+	return c:IsSetCard(0x9390) and c:IsType(TYPE_SPELL) and c:IsSSetable()
 end
 function c24562456.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0

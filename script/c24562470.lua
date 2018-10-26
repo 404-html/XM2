@@ -22,12 +22,12 @@ function c24562470.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c24562470.fil3(c,e,tp,zone)
-	return c:IsSetCard(0x1390) and c:IsAbleToRemoveAsCost()
+	return c:IsSetCard(0x9390) and c:IsAbleToRemoveAsCost()
 end
 function c24562470.mcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c24562470.fil3,tp,LOCATION_HAND,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c24562470.fil3,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,c24562470.fil3,tp,LOCATION_HAND,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,c24562470.fil3,tp,LOCATION_GRAVE,0,1,1,nil)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function c24562470.mop(e,tp,eg,ep,ev,re,r,rp)
@@ -39,7 +39,7 @@ function c24562470.mop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.MoveSequence(c,nseq)
 end
 function c24562470.fil2(c,e,tp,zone)
-	return c:IsSetCard(0x1390) and c:IsSummonable(true,nil,nil,zone) and c:IsType(TYPE_MONSTER)
+	return c:IsSetCard(0x9390) and c:IsSummonable(true,nil,nil,zone) and c:IsType(TYPE_MONSTER)
 end
 function c24562470.btg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
@@ -66,8 +66,8 @@ function c24562470.bcon(e)
 	return gc==0
 end
 function c24562470.fil1(c)
-	return not c:IsSetCard(0x1390) and c:IsFaceup()
+	return not c:IsSetCard(0x9390) and c:IsFaceup()
 end
 function c24562470.lcheck(g,lc)
-	return g:IsExists(Card.IsLinkSetCard,1,nil,0x1390)
+	return g:IsExists(Card.IsLinkSetCard,1,nil,0x9390)
 end

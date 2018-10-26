@@ -36,7 +36,7 @@ function c24762456.retop(e,tp,eg,ep,ev,re,r,rp)
 	  end
 end
 function c24762456.e1op(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.IsExistingMatchingCard(c24762456.e2fil,tp,LOCATION_DECK+LOCATION_REMOVED,0,1,nil) then
+	if Duel.IsExistingMatchingCard(c24762456.e2fil,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil) then
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 	local g=Duel.SelectMatchingCard(tp,c24762456.e1fil,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil)
 	local tc=g:GetFirst()
@@ -46,10 +46,10 @@ function c24762456.e1op(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c24762456.e1fil(c)
-	return c:IsSetCard(0x1390) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
+	return c:IsSetCard(0x9390) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
 end
 function c24762456.e1tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c24762456.e2fil,tp,LOCATION_DECK+LOCATION_REMOVED,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c24762456.e2fil,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,0,0)
 	e:GetHandler():RegisterFlagEffect(24762456,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end

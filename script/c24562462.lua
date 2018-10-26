@@ -33,7 +33,6 @@ function c24562462.dmgop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetAttackTarget()==nil then return false end
 	if tc:IsControler(tp) then tc=Duel.GetAttacker() end
 		local e5=Effect.CreateEffect(c)
-		e5:SetDescription(aux.Stringid(24562462,0))
 		e5:SetCategory(CATEGORY_DAMAGE)
 		e5:SetType(EFFECT_TYPE_QUICK_F)
 		e5:SetCode(EVENT_CHAINING)
@@ -44,6 +43,7 @@ function c24562462.dmgop(e,tp,eg,ep,ev,re,r,rp)
 		e5:SetOperation(c24562462.e5op)
 		e5:SetReset(RESET_EVENT+0x1fe0000)
 		tc:RegisterEffect(e5)
+		tc:RegisterFlagEffect(24562462,RESET_EVENT+0x1fe0000,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(24562462,0))
 end
 function c24562462.e5op(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
@@ -67,7 +67,7 @@ function c24562462.e2con(e,tp,eg,ep,ev,re,r,rp)
 	return c:GetLinkedGroupCount()>0
 end
 function c24562462.lcheck(g,lc)
-	return g:IsExists(Card.IsSetCard,1,nil,0x1390)
+	return g:IsExists(Card.IsSetCard,1,nil,0x9390)
 end
 function c24562462.e2op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
