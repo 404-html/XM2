@@ -38,8 +38,12 @@ function c24762457.e5cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.SelectMatchingCard(tp,c24762457.e5costfil,tp,LOCATION_ONFIELD,0,1,1,nil)
 	local tc=g:GetFirst()
 	if tc and Duel.Release(tc,REASON_COST)~=0 then
-		if tc:GetPreviousEquipTarget():IsCode(24762458) then
-			e:SetLabel(1)
+		if tc:IsPreviousLocation(LOCATION_SZONE) and tc:istype(TYPE_EQUIP) then
+			if tc:GetPreviousEquipTarget():IsCode(24762458) then
+				e:SetLabel(1)
+			else
+				e:SetLabel(0)
+			end
 		else e:SetLabel(0)
 		end
 	end
@@ -84,7 +88,7 @@ function c24762457.e2op(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(24762457,0))
 	local g=Duel.SelectMatchingCard(tp,c24762457.e2tgfil,tp,0,LOCATION_MZONE,1,1,nil)
 	local tc=g:GetFirst()
-		if Duel.GetLocationCount(1-tp,LOCATION_SZONE)>0 and not tc:IsType(TYPE_PENDULUM) then
+		if Duel.GetLocationCount(1-tp,LOCATION_SZONE)>0 and not (tc:IsType(TYPE_PENDULUM) and tc:IsImmuneToEffect(e)) then
 			if Duel.MoveToField(tc,tp,1-tp,LOCATION_SZONE,POS_FACEUP,true)~=0 then
 			local e10=Effect.CreateEffect(c)
 			e10:SetDescription(aux.Stringid(24762457,1))

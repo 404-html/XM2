@@ -32,7 +32,7 @@ function c24762460.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsAbleToHand() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToHand,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=Duel.SelectTarget(tp,Card.IsAbleToHand,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,e:GetHandler())
+	local g=Duel.SelectTarget(tp,Card.IsAbleToHand,tp,0,LOCATION_MZONE,1,1,e:GetHandler())
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
 end
 function c24762460.rmop(e,tp,eg,ep,ev,re,r,rp)
@@ -76,11 +76,6 @@ function c24762460.retop(e,tp,eg,ep,ev,re,r,rp)
 			Duel.ReturnToField(tc)
 			sg:RemoveCard(tc)
 		end
-	end
-	local tc=sg:GetFirst()
-	while tc do
-		Duel.ReturnToField(tc)
-		tc=sg:GetNext()
 	end
 end
 function c24762460.dircon(e)

@@ -92,7 +92,7 @@ end
 function c33350005.rdcon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	local tc2=tc:GetBattleTarget()
-	return ep==tp and tc2.setname=="TaleSouls" and tc:IsAttackPos()
+	return tc2 and ep==tp and tc2.setname=="TaleSouls" and tc:IsAttackPos()
 end
 function c33350005.rdop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ChangeBattleDamage(ep,ev/2)
