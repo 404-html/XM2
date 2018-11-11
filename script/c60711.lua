@@ -1,5 +1,12 @@
 --禁忌「Four of a Kind」
 function c60711.initial_effect(c)
+	--add code
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetCode(EFFECT_ADD_CODE)
+	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e0:SetValue(60700)
+	c:RegisterEffect(e0)	
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -16,13 +23,21 @@ function c60711.initial_effect(c)
 	e3:SetCondition(c60711.handcon)
 	c:RegisterEffect(e3)	
 	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(60711,0))
 	e2:SetCategory(CATEGORY_TOHAND)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetType(EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e2:SetCode(EVENT_TO_GRAVE)
+	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetTarget(c60711.target3)
 	e2:SetOperation(c60711.operation3)
 	c:RegisterEffect(e2)
+	--
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e5:SetCode(EVENT_BE_MATERIAL)
+	e5:SetCondition(c60711.atkcon)
+	e5:SetOperation(c60711.atkop)
+	c:RegisterEffect(e5)	
 end
 function c60711.filter(c)
 	return c:IsCode(60700) and c:IsAbleToHand()
@@ -77,7 +92,23 @@ function c60711.spop(e,tp,eg,ep,ev,re,r,rp)
 	if bbc>0 then 
 		local sg=e:GetHandler():GetColumnGroup()
 		if Duel.Destroy(sg,REASON_EFFECT)<1 then 
-			Duel.Damage(1-tp,1000,REASON_EFFECT)			
+			Duel.Damage(1-tp,495,REASON_EFFECT)			
 		end
 	end 
+end
+function c60711.atkcon(e,tp,eg,ep,ev,re,r,rp)
+	return r==REASON_SYNCHRO
+end
+function c60711.atkop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local rc=c:GetReasonCard()
+	local e2=Effect.CreateEffect(c)
+	e2:SetCategory(CATEGORY_TOHAND)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+	e2:SetTarget(c60711.target3)
+	e2:SetOperation(c60711.operation3)
+	rc:RegisterEffect(e2,true)
 end

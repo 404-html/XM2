@@ -64,7 +64,7 @@ function c1231100.sumcon(e,tp,eg,ep,ev,re,r,rp)
 	return  (ph==PHASE_MAIN1 or ph==PHASE_MAIN2) 
 end
 function c1231100.filter2(c)
-	return c:IsSetCard(0x813) and c:IsAbleToHand()
+	return c:IsSetCard(0x813) 
 end
 function c1231100.target3(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c1231100.filter2,tp,LOCATION_ONFIELD,0,1,nil) 
@@ -91,7 +91,7 @@ function c1231100.distarget(e,tp,eg,ep,ev,re,r,rp,chk)
 	local flag2=e:GetHandler():GetSequence()
 	if chk==0 then return Duel.IsExistingMatchingCard(c1231100.sfilter,tp,LOCATION_DECK,0,1,nil) 
 		and ((Duel.GetLocationCount(tp,LOCATION_SZONE))*(Duel.GetLocationCount(1-tp,LOCATION_SZONE)))>0
-		and (not Duel.GetFieldCard(tp,LOCATION_SZONE,flag4) or not Duel.GetFieldCard(tp,LOCATION_SZONE,flag2)) end
+		and (not Duel.GetFieldCard(tp,LOCATION_SZONE,flag4) or not Duel.GetFieldCard(1-tp,LOCATION_SZONE,flag2)) end
 	--e:SetLabel(e:GetHandler():GetSequence())
 end
 function c1231100.disop(e,tp,eg,ep,ev,re,r,rp)

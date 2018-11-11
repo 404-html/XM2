@@ -30,7 +30,7 @@ function c60151002.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
-	e3:SetCountLimit(1,60151002)
+	e3:SetCountLimit(1,6011002)
 	e3:SetTarget(c60151002.sptg)
 	e3:SetOperation(c60151002.spop)
 	c:RegisterEffect(e3)
@@ -58,31 +58,15 @@ function c60151002.disop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
 		e1:SetRange(LOCATION_MZONE)
 		e1:SetReset(RESET_EVENT+0x1ff0000+RESET_PHASE+PHASE_END)
-		e1:SetOperation(c60151002.disop2)
+		e1:SetOperation(c60151002.disop3)
 		c:RegisterEffect(e1)
 	end
 end
-function c60151002.discon2(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) 
-		and (re:IsHasType(EFFECT_TYPE_ACTIVATE) or re:IsActiveType(TYPE_MONSTER))
-		and re:GetHandler()~=e:GetHandler()
+function c60151002.disop3(e,tp,eg,ep,ev,re,r,rp)
+	Duel.SetChainLimit(c60151002.chlimit)
 end
 function c60151002.chlimit(e,ep,tp)
 	return tp==ep
-end
-function c60151002.distg2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetChainLimit(c60151002.chlimit)
-end
-function c60151002.disop2(e,tp,eg,ep,ev,re,r,rp)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetCode(EFFECT_CANNOT_ACTIVATE)
-	e1:SetTargetRange(0,1)
-	e1:SetValue(aux.TRUE)
-	e1:SetReset(RESET_PHASE+RESET_CHAIN)
-	Duel.RegisterEffect(e1,tp)
 end
 function c60151002.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToHandAsCost() end
@@ -106,26 +90,16 @@ function c60151002.filter3(c,e,tp)
 	return c:IsSetCard(0x5b23) and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c60151002.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetMZoneCount(tp)>0
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c60151002.filter3,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_GRAVE)
 end
 function c60151002.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetMZoneCount(tp)<=0 then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c60151002.filter3,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp)
 	local tc=g:GetFirst()
 	if tc and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_DISABLE)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
-		tc:RegisterEffect(e1,true)
-		local e2=Effect.CreateEffect(e:GetHandler())
-		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetCode(EFFECT_DISABLE_EFFECT)
-		e2:SetReset(RESET_EVENT+0x1fe0000)
-		tc:RegisterEffect(e2,true)
 		Duel.SpecialSummonComplete()
 	end
 end

@@ -30,7 +30,7 @@ function c60151001.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1,60151001)
+	e2:SetCountLimit(1,6011001)
 	e2:SetCost(c60151001.cost)
 	e2:SetTarget(c60151001.target)
 	e2:SetOperation(c60151001.operation)
@@ -64,14 +64,10 @@ function c60151001.disop2(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c60151001.disop3(e,tp,eg,ep,ev,re,r,rp)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetCode(EFFECT_CANNOT_ACTIVATE)
-	e1:SetTargetRange(0,1)
-	e1:SetValue(aux.TRUE)
-	e1:SetReset(RESET_PHASE+RESET_CHAIN)
-	Duel.RegisterEffect(e1,tp)
+	Duel.SetChainLimit(c60151001.chlimit)
+end
+function c60151001.chlimit(e,ep,tp)
+	return tp==ep
 end
 function c60151001.filter(c)
 	return c:IsSetCard(0x5b23) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()

@@ -41,6 +41,16 @@ function c1239999.initial_effect(c)
 	e5:SetOperation(c1239999.spop2)
 	c:RegisterEffect(e5)
 end
+                    -- AI.SelectCard(new[] {
+                    -- CardId.Scarlet_Destiny,
+                    -- CardId.Scarlet_Seance,
+                    -- CardId.Scarlet_Gensokyo
+                    -- });
+                        -- AI.SelectNextCard(new[] {
+                    -- CardId.Scarlet_Gensokyo,
+                    -- CardId.Scarlet_Seance,
+                    -- CardId.Scarlet_Overlay
+                    -- });
 function c1239999.spfilter(c,e,tp)
 	return c:IsSetCard(0x813) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and bit.band(c:GetOriginalType(),TYPE_MONSTER)~=0
 end

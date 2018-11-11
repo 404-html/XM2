@@ -80,36 +80,18 @@ end
 function c24562467.eqlimit(e,c)
 	return c:IsSetCard(0x9390)
 end
-function c24562467.filter0(c)
-	return c:IsOnField() and c:IsAbleToRemove()
-end
-function c24562467.filter1(c,e)
-	return c:IsOnField() and c:IsAbleToRemove() and not c:IsImmuneToEffect(e)
-end
 function c24562467.filter2(c,e,tp,m,f,chkf)
 	return c:IsType(TYPE_FUSION) and c:IsSetCard(0x9390) and (not f or f(c))
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) and c:CheckFusionMaterial(m,cv,chkf)
 end
 function c24562467.filter3(c)
-	return c:IsCanBeFusionMaterial() and c:IsAbleToRemove()
-end
-function c24562467.filter4(c,e)
-	return c:IsOnField() and c:IsAbleToRemove() and c:IsFaceup() and c:IsCanBeFusionMaterial()
-end
-function c24562467.filter5(c,e)
-	return c:IsOnField() and c:IsAbleToRemove() and c:IsCanBeFusionMaterial()
+	return c:IsCanBeFusionMaterial()
 end
 function c24562467.e3tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local cv=e:GetHandler()
 	if chk==0 then
 		local chkf=tp
-		local mg1=Duel.GetFusionMaterial(tp):Filter(c24562467.filter0,nil)
-		local mg2=Duel.GetMatchingGroup(c24562467.filter3,tp,LOCATION_GRAVE+LOCATION_DECK,0,nil)
-		local mg4=Duel.GetMatchingGroup(c24562467.filter4,tp,0,LOCATION_ONFIELD,nil)
-		local mg5=Duel.GetMatchingGroup(c24562467.filter5,tp,LOCATION_SZONE,0,nil)
-		mg1:Merge(mg2)
-		mg1:Merge(mg4)
-		mg1:Merge(mg5)
+		local mg1=Duel.GetMatchingGroup(c24562467.filter3,tp,LOCATION_ONFIELD+LOCATION_MZONE+LOCATION_DECK,0,nil)
 		local res=Duel.IsExistingMatchingCard(c24562467.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg1,nil,chkf,cv)
 		if not res then
 			local ce=Duel.GetChainMaterial(tp)
@@ -128,13 +110,7 @@ function c24562467.e3op(e,tp,eg,ep,ev,re,r,rp)
 	local cv=e:GetHandler()
 	local chkf=tp
 	if cv:IsFacedown() or not cv:IsRelateToEffect(e) or cv:IsImmuneToEffect(e) or not cv:IsAbleToRemove() then return false end
-	local mg1=Duel.GetFusionMaterial(tp):Filter(c24562467.filter1,nil,e)
-	local mg2=Duel.GetMatchingGroup(c24562467.filter3,tp,LOCATION_GRAVE+LOCATION_DECK,0,nil)
-	local mg4=Duel.GetMatchingGroup(c24562467.filter4,tp,0,LOCATION_ONFIELD,nil)
-	local mg5=Duel.GetMatchingGroup(c24562467.filter5,tp,LOCATION_SZONE,0,nil)
-	mg1:Merge(mg2)
-	mg1:Merge(mg4)
-	mg1:Merge(mg5)
+	local mg1=Duel.GetMatchingGroup(c24562467.filter3,tp,LOCATION_ONFIELD+LOCATION_MZONE+LOCATION_DECK,0,nil)
 	local sg1=Duel.GetMatchingGroup(c24562467.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg1,nil,chkf,cv)
 	local mg3=nil
 	local sg2=nil

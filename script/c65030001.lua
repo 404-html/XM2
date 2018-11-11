@@ -1,28 +1,13 @@
 --二色世界的学者
 function c65030001.initial_effect(c)
-	aux.EnableDualAttribute(c)
+	--fusion material
 	c:EnableReviveLimit()
-	aux.AddFusionProcFun2(c,aux.FilterBoolFunction(Card.IsFusionType,TYPE_DUAL),aux.FilterBoolFunction(Card.IsFusionType,TYPE_DUAL),true)
-	--spsummon
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(65030001,0))
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetType(EFFECT_TYPE_QUICK_O)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(1)
-	e1:SetCondition(aux.IsDualState)
-	e1:SetCost(c65030001.spcost)
-	e1:SetTarget(c65030001.sptg)
-	e1:SetOperation(c65030001.spop)
-	c:RegisterEffect(e1)
+	aux.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsFusionType,TYPE_FUSION),2,true)
 	--seq
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(65030001,1))
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
-	e2:SetCondition(aux.IsDualState)
 	e2:SetTarget(c65030001.target)
 	e2:SetOperation(c65030001.activate)
 	c:RegisterEffect(e2)
@@ -37,34 +22,6 @@ function c65030001.initial_effect(c)
 	e3:SetOperation(c65030001.thop)
 	c:RegisterEffect(e3)
 end
-
-function c65030001.costfil(c)
-	return c:IsType(TYPE_DUAL) and c:IsAbleToRemoveAsCost()
-end
-	
-function c65030001.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c65030001.costfil,tp,LOCATION_MZONE,0,1,e:GetHandler()) end
-	local g=Duel.SelectMatchingCard(tp,c65030001.costfil,tp,LOCATION_MZONE,0,1,1,e:GetHandler())
-	Duel.Remove(g,POS_FACEUP,REASON_COST)
-end
-function c65030001.spfilter(c,e,tp)
-	return c:IsSetCard(0x6da1) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false)
-end
-function c65030001.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCountFromEx(tp)>-1
-		and Duel.IsExistingMatchingCard(c65030001.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
-end
-function c65030001.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCountFromEx(tp,LOCATION_MZONE)<=0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c65030001.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
-	if g:GetCount()>0 then
-		Duel.SpecialSummon(g,SUMMON_TYPE_FUSION,tp,tp,false,false,POS_FACEUP)
-		local tc=g:GetFirst()
-		tc:CompleteProcedure()
-	end
-end
 function c65030001.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE,tp,LOCATION_REASON_CONTROL)>0 end
 end
@@ -77,15 +34,15 @@ function c65030001.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.MoveSequence(c,nseq)
 end
 function c65030001.thfilter(c)
-	return c:IsType(TYPE_EQUIP) and c:IsAbleToHand()
+	return c:IsSetCard(0x6da1) and c:IsAbleToHand()
 end
 function c65030001.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c65030001.thfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+	if chk==0 then return Duel.IsExistingMatchingCard(c65030001.thfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
 end
 function c65030001.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,c65030001.thfilter,tp,LOCATION_DECK,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,c65030001.thfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
 	if g:GetCount()>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)

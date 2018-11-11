@@ -30,7 +30,7 @@ function c60151004.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1,60151004)
+	e2:SetCountLimit(1,6011004)
 	e2:SetCost(c60151004.cost)
 	e2:SetTarget(c60151004.target)
 	e2:SetOperation(c60151004.operation)
@@ -63,30 +63,14 @@ function c60151004.disop2(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 	end
 end
-function c60151004.discon3(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) 
-		and (re:IsHasType(EFFECT_TYPE_ACTIVATE) or re:IsActiveType(TYPE_MONSTER))
-		and re:GetHandler()~=e:GetHandler()
+function c60151004.disop3(e,tp,eg,ep,ev,re,r,rp)
+	Duel.SetChainLimit(c60151004.chlimit)
 end
 function c60151004.chlimit(e,ep,tp)
 	return tp==ep
 end
-function c60151004.distg3(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetChainLimit(c60151004.chlimit)
-end
-function c60151004.disop3(e,tp,eg,ep,ev,re,r,rp)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetCode(EFFECT_CANNOT_ACTIVATE)
-	e1:SetTargetRange(0,1)
-	e1:SetValue(aux.TRUE)
-	e1:SetReset(RESET_PHASE+RESET_CHAIN)
-	Duel.RegisterEffect(e1,tp)
-end
 function c60151004.distg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetMZoneCount(tp)>0
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end

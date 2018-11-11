@@ -38,14 +38,14 @@ function c44447009.filter(c,tp)
 		and Duel.IsExistingMatchingCard(c44447009.filter2,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,c)
 end
 function c44447009.filter2(c,mc)
-	return bit.band(c:GetType(),0x81)==0x81 and not c:IsForbidden() and c44447009.isfit(c,mc)
+	return bit.band(c:GetType(),0x81)==0x81 and not c:IsForbidden() and c44447009.isfit(c,mc) and not c:IsCode(44446009)
 end
 function c44447009.isfit(c,mc)
 	return mc.fit_monster and c:IsCode(table.unpack(mc.fit_monster))
 end
 function c44447009.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c44447009.filter,tp,LOCATION_DECK,0,1,nil,tp) 
-	and Duel.GetLocationCount(tp,LOCATION_SZONE)>1 end
+	and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 end
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 end
 function c44447009.activate(e,tp,eg,ep,ev,re,r,rp)

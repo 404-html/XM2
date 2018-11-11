@@ -1,8 +1,9 @@
 --猛毒性 交翼
 function c24762460.initial_effect(c)
 	c:EnableReviveLimit()
-	aux.AddLinkProcedure(c,nil,2,3,c24762460.lcheck)
+	aux.AddLinkProcedure(c,nil,2,4,c24762460.lcheck)
 	local e2=Effect.CreateEffect(c)
+	e2:SetCategory(CATEGORY_ATKCHANGE)
 	e2:SetDescription(aux.Stringid(24762460,0))
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
@@ -12,76 +13,30 @@ function c24762460.initial_effect(c)
 	e2:SetOperation(c24762460.seqop)
 	c:RegisterEffect(e2)
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_DIRECT_ATTACK)
-	e1:SetCondition(c24762460.dircon)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetCode(EVENT_CHAIN_NEGATED)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCondition(c24762460.damcon)
+	e1:SetOperation(c24762460.damop)
 	c:RegisterEffect(e1)
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(24762460,1))
-	e3:SetCategory(CATEGORY_TOHAND)
-	e3:SetType(EFFECT_TYPE_QUICK_O)
-	e3:SetCode(EVENT_FREE_CHAIN)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetCountLimit(1,24762460)
-	e3:SetTarget(c24762460.rmtg)
-	e3:SetOperation(c24762460.rmop)
-	c:RegisterEffect(e3)
 end
-function c24762460.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsAbleToHand() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToHand,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler()) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=Duel.SelectTarget(tp,Card.IsAbleToHand,tp,0,LOCATION_MZONE,1,1,e:GetHandler())
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
-end
-function c24762460.rmop(e,tp,eg,ep,ev,re,r,rp)
+function c24762460.damop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
-	if Duel.SendtoHand(tc,nil,REASON_EFFECT+REASON_TEMPORARY)~=0 then
-		local og=Duel.GetOperatedGroup()
-		local oc=og:GetFirst()
-		if oc then
-		oc:RegisterFlagEffect(24762460,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_STANDBY+RESET_OPPO_TURN,0,1)
-		end
-		og:KeepAlive()
-		local e1=Effect.CreateEffect(c)
-		e1:SetDescription(aux.Stringid(24762460,2))
-		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
-		e1:SetReset(RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN)
-		e1:SetCountLimit(1)
-		e1:SetLabelObject(og)
-		e1:SetCondition(c24762460.retcon)
-		e1:SetOperation(c24762460.retop)
-		Duel.RegisterEffect(e1,tp)
-	end
-	end
+	local btk=c:GetBaseAttack()
+	local atk=c:GetAttack()
+	if atk==0 then return end
+	local ct=atk-btk
+	Duel.SetLP(1-tp,Duel.GetLP(1-tp)-ct)
 end
-function c24762460.retfilter(c)
-	return c:GetFlagEffect(24762460)~=0
+function c24762460.damcon(e,tp,eg,ep,ev,re,r,rp)
+	local atk=e:GetHandler():GetAttack()
+	if atk==0 then return end
+	local de,dp=Duel.GetChainInfo(ev,CHAININFO_DISABLE_REASON,CHAININFO_DISABLE_PLAYER)
+	return de and dp~=tp and (re:IsActiveType(TYPE_MONSTER) or re:IsHasType(EFFECT_TYPE_ACTIVATE)) and re:GetHandler():IsSetCard(0x9390) and rp==tp
 end
-function c24762460.retcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp
-end
-function c24762460.retop(e,tp,eg,ep,ev,re,r,rp)
-	local g=e:GetLabelObject()
-	local sg=g:Filter(c24762460.retfilter,nil)
-	if sg:GetCount()>1 and sg:GetClassCount(Card.GetPreviousControler)==1 then
-		local ft=Duel.GetLocationCount(sg:GetFirst():GetPreviousControler(),LOCATION_MZONE)
-		if ft==1 then
-			Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(24762460,2))
-			local tc=sg:Select(tp,1,1,nil):GetFirst()
-			Duel.ReturnToField(tc)
-			sg:RemoveCard(tc)
-		end
-	end
-end
-function c24762460.dircon(e)
-	local tp=e:GetHandlerPlayer()
-	local gc=e:GetHandler():GetColumnGroup():Filter(Card.IsControler,nil,1-tp):FilterCount(Card.IsType,nil,TYPE_MONSTER)
-	if gc==0 then return true end
+function c24762460.g2fil(c,tp)
+	return c:GetAttack()>0 and c:IsControler(1-tp) and c:IsLocation(LOCATION_MZONE) and c:IsType(TYPE_MONSTER) and c:IsFaceup()
 end
 function c24762460.filter(c,ggc)
 	local p=ggc:GetControler()
@@ -94,7 +49,6 @@ function c24762460.seqtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c24762460.seqop(e,tp,eg,ep,ev,re,r,rp)
 	local ggc=e:GetHandler()
-	local tc=Duel.GetFirstTarget()
 	local p=ggc:GetControler()
 	local zone=bit.band(ggc:GetLinkedZone(),0x1f)
 	if Duel.GetLocationCount(p,LOCATION_MZONE,p,LOCATION_REASON_CONTROL,zone)>0 then
@@ -110,7 +64,29 @@ function c24762460.seqop(e,tp,eg,ep,ev,re,r,rp)
 		elseif s==4 then nseq=2
 		elseif s==8 then nseq=3
 		else nseq=4 end
-		Duel.MoveSequence(ggc,nseq)
+		if Duel.MoveSequence(ggc,nseq)~=0 then
+Duel.BreakEffect()
+		local g=ggc:GetColumnGroup():Filter(c24762460.g2fil,nil,tp)
+			if g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(24762460,1)) then
+				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+				ga=g:Select(tp,0,1,nil)
+				tc=ga:GetFirst()
+				local atk=tc:GetBaseAttack()
+				local e1=Effect.CreateEffect(ggc)
+				e1:SetType(EFFECT_TYPE_SINGLE)
+				e1:SetCode(EFFECT_SET_ATTACK_FINAL)
+				e1:SetValue(0)
+				tc:RegisterEffect(e1)
+				if ggc:IsRelateToEffect(e) and ggc:IsFaceup() then
+					local e2=Effect.CreateEffect(ggc)
+					e2:SetType(EFFECT_TYPE_SINGLE)
+					e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+					e2:SetCode(EFFECT_UPDATE_ATTACK)
+					e2:SetValue(atk)
+					ggc:RegisterEffect(e2)
+				end
+			end
+		end
 	end
 end
 function c24762460.lcheck(g,lc)

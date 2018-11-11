@@ -1,9 +1,10 @@
 --半分虚幻的庭师 魂魄妖梦
-require "nef/thcz"
+--require "nef/thcz"
 function c1230401.initial_effect(c)
 	--synchro summon
-	Thcz.TheSynchroSummonOfPaysageONLY(c,Thcz.Tfilter,Thcz.NTfilter,true,nil)
-	--aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)
+	--Misaka.TheSynchroSummonOfMisakaONLY(c,Misaka.Tfilter,Misaka.NTfilter,true)
+	--Thcz.TheSynchroSummonOfPaysageONLY(c,Thcz.Tfilter,Thcz.NTfilter,true,nil)
+	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)
 	c:EnableReviveLimit()
 	--无敌，真的是无敌，这卡强到没法解
 	--迟早变龟

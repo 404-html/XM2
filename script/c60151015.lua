@@ -1,21 +1,8 @@
 --地平线的彼方 晓美焰
 function c60151015.initial_effect(c)
-	c:EnableReviveLimit()
-	--spsummon condition
-	local e11=Effect.CreateEffect(c)
-	e11:SetType(EFFECT_TYPE_SINGLE)
-	e11:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e11:SetCode(EFFECT_SPSUMMON_CONDITION)
-	c:RegisterEffect(e11)
-	--special summon rule
-	local e12=Effect.CreateEffect(c)
-	e12:SetType(EFFECT_TYPE_FIELD)
-	e12:SetCode(EFFECT_SPSUMMON_PROC)
-	e12:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-	e12:SetRange(LOCATION_EXTRA)
-	e12:SetCondition(c60151015.spcon)
-	e12:SetOperation(c60151015.spop)
-	c:RegisterEffect(e12)
+    --link summon
+    c:EnableReviveLimit()
+    aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsLinkSetCard,0x5b23),2,2)
 	--atk
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(60151015,0))
@@ -49,28 +36,14 @@ function c60151015.initial_effect(c)
 	e5:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 	e5:SetValue(1)
 	c:RegisterEffect(e5)
-end
-function c60151015.spfilter1(c,tp)
-	return c:IsRace(RACE_SPELLCASTER) and c:IsSetCard(0x5b23) and c:IsCanBeFusionMaterial()
-		and Duel.CheckReleaseGroup(tp,c60151015.spfilter2,1,c)
-end
-function c60151015.spfilter2(c)
-	return c:IsType(TYPE_XYZ) and c:IsSetCard(0x5b23) and c:IsCanBeFusionMaterial()
-end
-function c60151015.spcon(e,c)
-	if c==nil then return true end
-	local tp=c:GetControler()
-	return Duel.GetMZoneCount(tp)>-2
-		and Duel.CheckReleaseGroup(tp,c60151015.spfilter1,1,nil,tp)
-end
-function c60151015.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(60151016,2))
-	local g1=Duel.SelectMatchingCard(tp,c60151015.spfilter1,tp,LOCATION_MZONE,0,1,1,nil,tp)
-	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(60151016,3))
-	local g2=Duel.SelectMatchingCard(tp,c60151015.spfilter2,tp,LOCATION_MZONE,0,1,1,nil,tp)
-	g1:Merge(g2)
-	c:SetMaterial(g1)
-	Duel.Release(g1,REASON_COST)
+    --atk immune
+    local e6=Effect.CreateEffect(c)
+    e6:SetType(EFFECT_TYPE_SINGLE)
+    e6:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+    e6:SetRange(LOCATION_MZONE)
+    e6:SetCode(EFFECT_IMMUNE_EFFECT)
+    e6:SetValue(c60151015.efilter2)
+    c:RegisterEffect(e6)
 end
 function c60151015.discon(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) 
@@ -118,4 +91,12 @@ function c60151015.drop2(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetValue(300)
 	e1:SetReset(RESET_EVENT+0x1ff0000)
 	c:RegisterEffect(e1)
+end
+function c60151015.efilter2(e,te)
+    if te:IsActiveType(TYPE_MONSTER) and te:GetOwnerPlayer()~=e:GetHandlerPlayer() then
+        local atk=e:GetHandler():GetAttack()
+        local ec=te:GetHandler()
+        return ec:GetAttack()<atk
+    end
+    return false
 end

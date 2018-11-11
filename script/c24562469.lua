@@ -17,12 +17,23 @@ function c24562469.initial_effect(c)
 	local e4=Effect.CreateEffect(c)
 	e4:SetCategory(CATEGORY_DAMAGE)
 	e4:SetCode(EVENT_DAMAGE)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetProperty(EFFECT_FLAG_DELAY)
 	e4:SetCountLimit(1,2456246902)
 	e4:SetCondition(c24562469.e4con)
 	e4:SetTarget(c24562469.e4tg)
 	e4:SetOperation(c24562469.e4op)
 	c:RegisterEffect(e4)
+	local e3=Effect.CreateEffect(c)
+	e3:SetCategory(CATEGORY_DAMAGE)
+	e3:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
+	e3:SetCode(EVENT_BATTLE_DAMAGE)
+	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e3:SetCountLimit(1,2456246902)
+	e3:SetTarget(c24562469.e4tg)
+	e3:SetOperation(c24562469.e4op)
+	c:RegisterEffect(e3)
 end
 function c24562469.r4fil(c)
 	return c:IsSetCard(0x9390) and c:IsAbleToRemoveAsCost()
@@ -62,6 +73,10 @@ function c24562469.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SendtoHand(e:GetHandler(),nil,REASON_EFFECT)
 end
 function c24562469.e4con(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if bit.band(r,REASON_EFFECT)~=0 then
+	return re and re:GetHandler()==c
+	end
 	return ep~=tp
 end
 function c24562469.damcon(e,tp,eg,ep,ev,re,r,rp)

@@ -30,11 +30,11 @@ function c60611.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c60611.homofilter(c)
-	return c:IsSetCard(0x813) and c:GetFlagEffect(60611976)==0
+	return c:IsSetCard(0x813) and c:GetFlagEffect(60611976)==0 and c:GetOriginalCode()~=60300
 end
 function c60611.adjustop(e,tp,eg,ep,ev,re,r,rp)
 	local tp=e:GetOwnerPlayer()
-	local ag=Duel.GetMatchingGroup(c60611.homofilter,tp,LOCATION_HAND,LOCATION_HAND,nil)
+	local ag=Duel.GetMatchingGroup(c60611.homofilter,tp,LOCATION_HAND,0,nil)
 	local tc9=ag:GetFirst()
 	if ag:GetCount()==0 then return end 
 	while tc9 do
@@ -49,7 +49,7 @@ function c60611.adjustop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetOperation(c60611.otop)
 		e1:SetValue(SUMMON_TYPE_ADVANCE)
 		tc9:RegisterEffect(e1)
-		tc9:RegisterFlagEffect(60611976,RESET_EVENT+0x1ff0000,0,0)
+		tc9:RegisterFlagEffect(60611976,RESET_EVENT+0x1fe0000,0,0)
 		tc9=ag:GetNext()
 	end 
 end

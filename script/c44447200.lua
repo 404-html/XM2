@@ -24,7 +24,7 @@ function c44447200.initial_effect(c)
 	--tograve
 	local e12=Effect.CreateEffect(c)
 	e12:SetCategory(CATEGORY_TOGRAVE)
-	e12:SetType(EFFECT_TYPE_ACTIVATE)
+	e12:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 
 	e12:SetCode(EVENT_LEAVE_FIELD)
 	e12:SetCondition(c44447200.scon)

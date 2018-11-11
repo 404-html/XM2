@@ -18,7 +18,7 @@ function c1230700.initial_effect(c)
 	--search
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_SUMMON)
-	e2:SetDescription(aux.Stringid(100511,1))
+	e2:SetDescription(aux.Stringid(1230700,1))
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_TO_HAND)
 	e2:SetRange(LOCATION_MZONE)
@@ -28,6 +28,36 @@ function c1230700.initial_effect(c)
 	e2:SetTarget(c1230700.stg)
 	e2:SetOperation(c1230700.sop)
 	c:RegisterEffect(e2)
+	-- --synchro effect
+	-- local e1=Effect.CreateEffect(c)
+	-- e1:SetDescription(aux.Stringid(70200,0))
+	-- e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	-- e1:SetType(EFFECT_TYPE_QUICK_O)
+	-- e1:SetCode(EVENT_FREE_CHAIN)
+	-- --e1:SetCountLimit(1,70200)
+	-- e1:SetHintTiming(0,0x1c0+TIMING_MAIN_END)
+	-- e1:SetRange(LOCATION_MZONE)
+	-- e1:SetCondition(c1230700.sccon)
+	-- e1:SetTarget(c1230700.sctarg)
+	-- e1:SetOperation(c1230700.scop)
+	-- c:RegisterEffect(e1)	
+end
+function c1230700.sccon(e,tp,eg,ep,ev,re,r,rp)
+	return (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2)
+end
+function c1230700.sctarg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsSynchroSummonable,tp,LOCATION_EXTRA,0,1,nil,e:GetHandler()) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+end
+function c1230700.scop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:GetControler()~=tp or not c:IsRelateToEffect(e) then return end
+	local g=Duel.GetMatchingGroup(Card.IsSynchroSummonable,tp,LOCATION_EXTRA,0,nil,c)
+	if g:GetCount()>0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local sg=g:Select(tp,1,1,nil)
+		Duel.SynchroSummon(tp,sg:GetFirst(),c)
+	end
 end
 function c1230700.filter(c)
 	return c:IsType(TYPE_FIELD) and c:IsAbleToHand()

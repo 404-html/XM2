@@ -32,7 +32,7 @@ function c40006884.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
 end
 function c40006884.matfilter(c)
-	return c:IsLinkType(TYPE_EFFECT) and not c:IsLinkCode(40006884)
+	return c:IsLinkSetCard(0xdf1d) and not c:IsLinkCode(40006884)
 end
 function c40006884.filter(c)
 	return not c:IsCode(40006884) and c:IsSetCard(0xdf1d) and c:IsType(TYPE_MONSTER) and not c:IsForbidden()

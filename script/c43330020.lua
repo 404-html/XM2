@@ -145,7 +145,7 @@ function cm.rmop(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetCode(EFFECT_UPDATE_ATTACK)
 			e1:SetReset(RESET_EVENT+0x1fe0000)
-			e1:SetValue(1000)
+			e1:SetValue(500)
 			tc:RegisterEffect(e1) 
 		end
 	end
@@ -258,7 +258,7 @@ function cm.atkop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
-		e1:SetValue(600)
+		e1:SetValue(300)
 		tc:RegisterEffect(e1) 
 	end
 end

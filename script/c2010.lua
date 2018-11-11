@@ -72,7 +72,7 @@ function c2010.leave(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c2010.filter(c)
-	return (c:IsSetCard(0x203) or c:IsCode(2009)) and c:IsFaceup()
+	return (c:IsSetCard(0x203) or c:IsCode(2009) or c:IsCode(2036)) and c:IsFaceup()
 end
 function c2010.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and  c2010.filter(chkc) end

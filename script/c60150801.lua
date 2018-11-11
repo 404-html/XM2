@@ -16,22 +16,22 @@ function c60150801.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_REMOVE)
 	e2:SetRange(LOCATION_GRAVE)
-	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetCountLimit(1,60150801)
-	e2:SetCondition(c60150801.rmcon2)
+	e2:SetCountLimit(1,6010801)
+	--e2:SetCondition(c60150801.rmcon2)
 	e2:SetTarget(c60150801.sptg2)
 	e2:SetOperation(c60150801.rmop2)
 	c:RegisterEffect(e2)
 end
 function c60150801.cfilter2(c,tp)
-	return c:IsControler(1-tp) and c:GetPreviousControler()~=tp
+	return c:IsControler(1-tp) and c:GetPreviousControler()==1-tp
 end
 function c60150801.rmcon2(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c60150801.cfilter2,1,nil,tp)
 end
 function c60150801.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetMZoneCount(tp)>0
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
@@ -48,7 +48,7 @@ function c60150801.rmop2(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 		--xyz limit
 		local e4=Effect.CreateEffect(c)
-		e4:SetDescription(aux.Stringid(60150822,0))
+		e4:SetDescription(aux.Stringid(60150801,0))
 		e4:SetType(EFFECT_TYPE_SINGLE)
 		e4:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CLIENT_HINT)
 		e4:SetCode(EFFECT_CANNOT_BE_XYZ_MATERIAL)
@@ -62,10 +62,10 @@ function c60150801.xyzlimit(e,c)
 	return not (c:IsAttribute(ATTRIBUTE_DARK) and c:IsRace(RACE_SPELLCASTER))
 end
 function c60150801.sumlimit(e,c,sump,sumtype,sumpos,targetp,se)
-	return not (c:IsSetCard(0x3b23) and c:IsAttribute(ATTRIBUTE_DARK))
+	return not (c:IsSetCard(0x3b23))
 end
 function c60150801.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x3b23)
+	return c:IsFaceup() and c:IsSetCard(0x3b23) and c:IsAttribute(ATTRIBUTE_DARK)
 end
 function c60150801.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c60150801.cfilter,tp,LOCATION_MZONE,0,1,nil)

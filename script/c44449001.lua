@@ -48,4 +48,5 @@ function c44449001.repval(e,c)
 end
 function c44449001.repop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SendtoDeck(e:GetHandler(),nil,2,REASON_EFFECT)
+	Duel.ShuffleDeck(tp)
 end

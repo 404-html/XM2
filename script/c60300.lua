@@ -3,7 +3,8 @@ function c60300.initial_effect(c)
 	--summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(60300,0))
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetOperation(c60300.sumop)
 	c:RegisterEffect(e1)
@@ -61,5 +62,40 @@ function c60300.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+0x47e0000)
 		e1:SetValue(LOCATION_DECK)
 		c:RegisterEffect(e1,true)
+		--synchro effect
+		local e2=Effect.CreateEffect(c)
+		e2:SetDescription(aux.Stringid(60300,2))
+		e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+		e2:SetType(EFFECT_TYPE_QUICK_O)
+		e2:SetCode(EVENT_FREE_CHAIN)
+		e2:SetCountLimit(1)	
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_DISABLE)
+		e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
+		e2:SetRange(LOCATION_MZONE)
+		e2:SetCondition(c60300.sccon)
+		e2:SetTarget(c60300.sctarg)
+		e2:SetOperation(c60300.scop)
+		c:RegisterEffect(e2)
+	end
+end
+function c60300.sccon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()~=tp
+		and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2)
+end
+function c60300.sctarg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return c:GetFlagEffect(60300)==0
+		and Duel.IsExistingMatchingCard(Card.IsSynchroSummonable,tp,LOCATION_EXTRA,0,1,nil,c) end
+	c:RegisterFlagEffect(60300,RESET_CHAIN,0,1)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+end
+function c60300.scop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:GetControler()~=tp or not c:IsRelateToEffect(e) then return end
+	local g=Duel.GetMatchingGroup(Card.IsSynchroSummonable,tp,LOCATION_EXTRA,0,nil,c)
+	if g:GetCount()>0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local sg=g:Select(tp,1,1,nil)
+		Duel.SynchroSummon(tp,sg:GetFirst(),c)
 	end
 end

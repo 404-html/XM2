@@ -110,8 +110,8 @@ function c60700.distarget(e,tp,eg,ep,ev,re,r,rp,chk)
 	else
 		e:SetCategory(CATEGORY_DAMAGE)
 		Duel.SetTargetPlayer(1-tp)
-		Duel.SetTargetParam(1000)
-		Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,1000)
+		Duel.SetTargetParam(495)
+		Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,495)
 	end 
 end
 function c60700.disop(e,tp,eg,ep,ev,re,r,rp)
@@ -119,7 +119,7 @@ function c60700.disop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) and Duel.Destroy(sg,REASON_EFFECT)<1 then 
 		local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 		if d<100 then 
-			Duel.Damage(1-tp,1000,REASON_EFFECT)			
+			Duel.Damage(1-tp,495,REASON_EFFECT)			
 		else
 			Duel.Damage(p,d,REASON_EFFECT)				
 		end 
@@ -127,7 +127,7 @@ function c60700.disop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c60700.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return bit.band(c:GetSummonType(),SUMMON_TYPE_ADVANCE)==SUMMON_TYPE_ADVANCE and c:IsPreviousLocation(LOCATION_MZONE)
+	return bit.band(c:GetSummonType(),SUMMON_TYPE_ADVANCE)==SUMMON_TYPE_ADVANCE and c:IsPreviousLocation(LOCATION_MZONE) and c:IsLocation(LOCATION_GRAVE)
 end
 function c60700.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

@@ -35,10 +35,10 @@ function c40006882.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoDeck(g,e:GetHandler(),2,REASON_COST)
 end
 function c40006882.filter1(c)
-	return c:IsSetCard(0xdf1d) and c:IsAbleToGrave()
+	return c:IsSetCard(0xdf1d) and c:IsAbleToGrave() and not c:IsCode(40006882)
 end
 function c40006882.filter2(c)
-	return c:IsSetCard(0xdf1d) and c:IsAbleToHand()
+	return c:IsSetCard(0xdf1d) and c:IsAbleToHand() and not c:IsCode(40006882)
 end
 function c40006882.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c40006882.filter1,tp,LOCATION_DECK,0,1,nil) and  Duel.IsExistingMatchingCard(c40006882.filter2,tp,LOCATION_DECK,0,1,nil) end
@@ -69,10 +69,10 @@ function c40006882.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoDeck(e:GetHandler(),nil,2,REASON_COST)
 end
 function c40006882.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,2) end
 	Duel.SetTargetPlayer(tp)
-	Duel.SetTargetParam(1)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
+	Duel.SetTargetParam(2)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
 end
 function c40006882.thop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)

@@ -17,6 +17,7 @@ function c40006881.initial_effect(c)
 	e2:SetCategory(CATEGORY_EQUIP)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCondition(c40006881.spcon2)
 	e2:SetTarget(c40006881.eqtg)
 	e2:SetOperation(c40006881.eqop)
@@ -41,7 +42,7 @@ function c40006881.sscost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if g:GetFirst():IsLocation(LOCATION_HAND) then
 		Duel.ConfirmCards(1-tp,g)
 	end
-	Duel.SendtoDeck(g,e:GetHandler(),2,REASON_COST)
+	Duel.SendtoDeck(g,nil,2,REASON_COST)
 end
 function c40006881.sstg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

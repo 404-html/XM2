@@ -1,5 +1,6 @@
 --百夜·绘蓝
 function c44448000.initial_effect(c)
+	c:SetUniqueOnField(1,0,44448000)
 	--link summon
 	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsLinkAttribute,ATTRIBUTE_WATER),2)
 	c:EnableReviveLimit()

@@ -23,7 +23,7 @@ function c60612.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c60612.filter(c)
-	return c:IsSetCard(0x813) 
+	return c:IsSetCard(0x813) and c:IsFaceup()
 end
 function c60612.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,2) and Duel.IsExistingMatchingCard(c60612.filter,tp,LOCATION_ONFIELD,0,1,nil) end
