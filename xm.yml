@@ -1,0 +1,48 @@
+language: cpp
+dist: xenial
+git:
+  submodules: false
+addons:
+  ssh_known_hosts:
+  - github.com
+  apt:
+    packages:
+      - libevent-dev
+      - libsqlite3-dev
+env:
+- DATABASE_FILE=expansions/.cdb
+
+before_install:
+- git config --global user.name YGOPRO-520DIY
+- git config --global user.email 1191818788@qq.com
+
+- git clone --depth=1 --branch=server --recursivehttps://github.com/YGOPRO-520DIY/expansions
+- cd expansions
+
+- git submodule foreach git checkout master
+- ln -s ./../expansions .
+
+- wget -O - https://github.com/premake/premake-core/releases/download/v5.0.0-alpha13/premake-5.0.0-alpha13-linux.tar.gz | tar zfx -
+- wget -O - https://www.lua.org/ftp/lua-5.3.5.tar.gz | tar zfx -; cd lua-5.3.5; sudo make linux install; cd ..
+- ./premake5 gmake
+- cd build
+- make config=release
+
+- cd ..
+- mv -f ./bin/release/ygopro .
+- strip ygopro
+- mkdir replay
+
+script:
+- echo "select id from datas;" | sqlite3 $DATABASE_FILE | xargs -I {} ./ygopro {} 2>&1 | tee ../redtext.txt
+- cd ..
+
+- bash -c "exit $(cat ./redtext.txt | wc -l)"
+
+- git add ./redtext.txt
+- git commit -m "test redtext of $TRAVIS_COMMIT"
+- git push -f https://$NANAHIRA@github.com/purerosefallen/ygopro-222DIY-data HEAD:redtext
+
+branches:
+  only:
+  - master
