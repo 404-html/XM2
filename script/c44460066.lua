@@ -9,7 +9,7 @@ function c44460066.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetRange(LOCATION_EXTRA)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetCondition(c44460066.xycon)
+	--e1:SetCondition(c44460066.xycon)
 	e1:SetCost(c44460066.xycost)
 	e1:SetTarget(c44460066.xytg)
 	e1:SetOperation(c44460066.xyop)
@@ -52,8 +52,12 @@ function c44460066.xycon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c44460066.filter,1,nil,tp)
 end
 function c44460066.xytg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>-2
-	and Duel.IsExistingMatchingCard(c44460066.tfilter,tp,LOCATION_ONFIELD,0,2,nil) end
+	local tc=eg:GetFirst()
+	if chk==0 then return tc:IsCode(44460004)
+	and tc:GetControler()==tp
+		and Duel.GetLocationCount(tp,LOCATION_SZONE)>-2
+        and Duel.IsExistingMatchingCard(c44460066.tfilter,tp,LOCATION_ONFIELD,0,2,nil) end
+	tc:CreateEffectRelation(e)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_ONFIELD)
 	Duel.SetChainLimit(c44460066.climit)
 end
@@ -91,8 +95,8 @@ function c44460066.repfilter2(c)
 end
 function c44460066.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return eg:IsExists(c44460066.dfilter,1,nil,tp)
-		and Duel.IsExistingMatchingCard(c44460066.repfilter,tp,LOCATION_ONFIELD,0,1,nil) end
-	return Duel.SelectEffectYesNo(tp,e:GetHandler(),96)
+		and Duel.IsExistingMatchingCard(c44460066.repfilter,tp,LOCATION_ONFIELD,0,1,nil) 
+	and Duel.SelectEffectYesNo(tp,e:GetHandler(),96) end
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,0,0,tp,1000)
 end
 function c44460066.value(e,c)
@@ -107,8 +111,8 @@ function c44460066.desop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c44460066.destg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return eg:IsExists(c44460066.dfilter,1,nil,tp)
-		and Duel.IsExistingMatchingCard(c44460066.repfilter,tp,0,LOCATION_ONFIELD,1,nil) end
-	return Duel.SelectEffectYesNo(tp,e:GetHandler(),96)
+		and Duel.IsExistingMatchingCard(c44460066.repfilter,tp,0,LOCATION_ONFIELD,1,nil) 
+	and Duel.SelectEffectYesNo(tp,e:GetHandler(),96) end
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,0,0,tp,1000)
 end
 function c44460066.desop2(e,tp,eg,ep,ev,re,r,rp)

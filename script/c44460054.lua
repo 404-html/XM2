@@ -9,7 +9,7 @@ function c44460054.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetRange(LOCATION_EXTRA)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetCondition(c44460054.xycon)
+	--e1:SetCondition(c44460054.xycon)
 	e1:SetCost(c44460054.xycost)
 	e1:SetTarget(c44460054.xytg)
 	e1:SetOperation(c44460054.xyop)
@@ -30,7 +30,7 @@ function c44460054.initial_effect(c)
 	e21:SetRange(LOCATION_ONFIELD)
 	e21:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e21:SetTargetRange(1,0)
-	e21:SetCondition(c44460054.condition)
+	e21:SetCondition(c44460054.damcon)
 	c:RegisterEffect(e21)
 	--reduce
 	local e22=Effect.CreateEffect(c)
@@ -62,7 +62,11 @@ function c44460054.xycon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c44460054.filter,1,nil,tp)
 end
 function c44460054.xytg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0 end
+	local tc=eg:GetFirst()
+	if chk==0 then return (tc:IsCode(44460001) or tc:IsCode(44460005)) and tc:GetControler()==tp
+		and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 
+		and Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_ONFIELD,0,1,nil,0x679) end
+	tc:CreateEffectRelation(e)
 	Duel.SetChainLimit(c44460054.climit)
 end
 function c44460054.xyop(e,tp,eg,ep,ev,re,r,rp)
@@ -80,7 +84,7 @@ function c44460054.xyop(e,tp,eg,ep,ev,re,r,rp)
 	    c:RegisterEffect(e1)
 end
 function c44460054.climit(e,lp,tp)
-	return e:IsHasType(EFFECT_TYPE_ACTIVATE)
+	return e:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_MONSTER) 
 end
 --disable
 function c44460054.disable(e,c)
@@ -89,18 +93,20 @@ end
 --avoid damage
 function c44460054.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c44460054.cfilter,tp,LOCATION_MZONE,0,1,nil)
+	 and Duel.IsExistingMatchingCard(c44460054.cfilter,tp,0,LOCATION_MZONE,1,nil)
 end
 function c44460054.cfilter(c)
 	return c:IsPosition(POS_FACEUP_ATTACK)
 end
 function c44460054.damcon(e)
 	return Duel.IsExistingMatchingCard(c44460054.cfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
+	 and Duel.IsExistingMatchingCard(c44460054.cfilter,e:GetHandlerPlayer(),0,LOCATION_MZONE,1,nil)
 end
 function c44460054.damval(e,re,val,r,rp,rc)
 	if bit.band(r,REASON_EFFECT)~=0 then return 0 end
 	return val
 end
 function c44460054.aclimit(e,re,tp)
-    local tc=re:GetHandler()
-	return re:IsActiveType(TYPE_MONSTER) and  tc:IsPosition(POS_FACEUP_ATTACK)
+    local c=re:GetHandler()
+	return re:IsActiveType(TYPE_MONSTER) and c:IsLocation(LOCATION_MZONE) and c:IsPosition(POS_FACEUP_ATTACK)
 end
