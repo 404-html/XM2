@@ -84,7 +84,7 @@ function c43330009.rpop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c43330009.spcfilter(c,tp)
 	return c:IsReason(REASON_BATTLE+REASON_EFFECT)
-		and c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_ONFIELD)
+		and c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_ONFIELD) and c.setcard=="terraria"
 end
 function c43330009.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c43330009.spcfilter,1,nil,tp)
@@ -101,7 +101,7 @@ function c43330009.thfilter1(c,tp,id)
 		and Duel.IsExistingMatchingCard(c43330009.thfilter2,tp,LOCATION_DECK,0,1,nil,c:GetCode())
 end
 function c43330009.thfilter2(c,code)
-	return c:IsCode(code) and c:IsAbleToHand()
+	return c:IsCode(code) and c:IsAbleToHand() and c.setcard=="terraria"
 end
 function c43330009.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
