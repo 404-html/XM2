@@ -100,7 +100,7 @@ function cm.splimit(e,se,sp,st)
 end
 	--special summon rule
 function cm.spfilter(c)
-	return c:IsFusionSetCard(0xee7) and c:IsCanBeFusionMaterial() and c:IsAbleToRemoveAsCost()
+	return c:IsFusionSetCard(0xee7) and c:IsType(TYPE_MONSTER) and c:IsCanBeFusionMaterial() and c:IsAbleToRemoveAsCost()
 end
 function cm.fselect(c,tp,mg,sg)
 	sg:AddCard(c)

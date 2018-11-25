@@ -92,6 +92,10 @@ function cm.initial_effect(c)
 	e10:SetOperation(cm.damop3)
 	c:RegisterEffect(e10)
 end
+	--link summon
+function cm.lcheck(g,lc)
+	return g:IsExists(Card.IsLinkSetCard,1,nil,0xee7)
+end
 	--counter
 function cm.cffilter(c)
 	return c:IsSetCard(0xee7) and not c:IsPublic()

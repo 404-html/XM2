@@ -9,7 +9,7 @@ function c44460050.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetRange(LOCATION_EXTRA)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetCondition(c44460050.xycon)
+	--e1:SetCondition(c44460050.xycon)
 	e1:SetCost(c44460050.xycost)
 	e1:SetTarget(c44460050.xytg)
 	e1:SetOperation(c44460050.xyop)
@@ -48,10 +48,13 @@ function c44460050.filter(c,tp)
 end
 function c44460050.xycon(e,tp,eg,ep,ev,re,r,rp)
     if not Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_ONFIELD,0,1,nil,0x679) then return false end
-	return eg:IsExists(c44460050.filter,1,nil,tp)
 end
 function c44460050.xytg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0 end
+	local tc=eg:GetFirst()
+	if chk==0 then return (tc:IsCode(44460001) or tc:IsCode(44460005)) and tc:GetControler()==tp
+		and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 
+		and Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_ONFIELD,0,1,nil,0x679) end
+	tc:CreateEffectRelation(e)
 	Duel.SetChainLimit(c44460050.climit)
 end
 function c44460050.xyop(e,tp,eg,ep,ev,re,r,rp)
@@ -64,7 +67,7 @@ function c44460050.xyop(e,tp,eg,ep,ev,re,r,rp)
 	    e1:SetType(EFFECT_TYPE_SINGLE)
 	    e1:SetCode(EFFECT_CHANGE_TYPE)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	    e1:SetValue(TYPE_SPELL)
+	    e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 	    c:RegisterEffect(e1)
 end

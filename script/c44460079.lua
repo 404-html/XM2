@@ -2,6 +2,7 @@
 function c44460079.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(44460079,0))
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,44460079)
@@ -49,17 +50,19 @@ function c44460079.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 	local g=Duel.SelectMatchingCard(tp,c44460079.filter,tp,LOCATION_DECK,0,1,1,nil)
+	if g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(44460079,0)) then
 	local tc=g:GetFirst()
-	if tc then
+	    if tc then
 		Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 		Duel.ConfirmCards(1-tp,tc)
 		local e1=Effect.CreateEffect(e:GetHandler())
 	    e1:SetType(EFFECT_TYPE_SINGLE)
 	    e1:SetCode(EFFECT_CHANGE_TYPE)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	    e1:SetValue(TYPE_SPELL)
+	    e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 	    tc:RegisterEffect(e1)
+	    end
 	end
 end
 --summon

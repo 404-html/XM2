@@ -71,6 +71,7 @@ function cm.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g2=g:FilterSelect(tp,cm.spfilter2,1,1,mc,tp,mc)
 	g1:Merge(g2)
+	c:SetMaterial(g1)
 	Duel.SendtoDeck(g1,nil,2,REASON_COST)
 end
 --Handes

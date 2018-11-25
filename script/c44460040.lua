@@ -9,7 +9,7 @@ function c44460040.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetRange(LOCATION_EXTRA)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetCondition(c44460040.xycon)
+	--e1:SetCondition(c44460040.xycon)
 	e1:SetCost(c44460040.xycost)
 	e1:SetTarget(c44460040.xytg)
 	e1:SetOperation(c44460040.xyop)
@@ -35,7 +35,10 @@ function c44460040.xycon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c44460040.filter,1,nil,tp)
 end
 function c44460040.xytg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0 end
+	local tc=eg:GetFirst()
+	if chk==0 then return tc:GetLevel()==1 and tc:GetControler()==tp
+		and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 end
+	tc:CreateEffectRelation(e)
 	Duel.SetChainLimit(c44460040.climit)
 end
 function c44460040.xyop(e,tp,eg,ep,ev,re,r,rp)
@@ -48,7 +51,7 @@ function c44460040.xyop(e,tp,eg,ep,ev,re,r,rp)
 	    e1:SetType(EFFECT_TYPE_SINGLE)
 	    e1:SetCode(EFFECT_CHANGE_TYPE)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	    e1:SetValue(TYPE_SPELL)
+	    e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 	    c:RegisterEffect(e1)
 end

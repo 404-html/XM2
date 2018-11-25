@@ -46,20 +46,17 @@ function c65030020.edfil(c)
 	return c:GetAttackAnnouncedCount()==0 or c:IsAttack(0) 
 end
 function c65030020.edtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return Duel.IsExistingMatchingCard(c65030020.edfil,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,1-tp,LOCATION_MZONE)
 end
 function c65030020.edop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c65030020.edfil,tp,0,LOCATION_MZONE,nil)
 	if g:GetCount()>0 then
-		local num=Duel.Remove(g,POS_FACEDOWN,REASON_EFFECT)
+		local num=Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 		if num~=0 then
 			Duel.BreakEffect()
-			Duel.SetLP(1-tp,Duel.GetLP(1-tp)-500*num)
+			Duel.SetLP(1-tp,Duel.GetLP(1-tp)-1000*num)
 		end
-	end
-	if g:GetCount()==0 and (Duel.GetActivityCount(1-tp,ACTIVITY_SPSUMMON)==0 and Duel.GetActivityCount(1-tp,ACTIVITY_SUMMON)==0 and Duel.GetActivityCount(1-tp,ACTIVITY_ATTACK)==0) then
-		Duel.SetLP(1-tp,Duel.GetLP(1-tp)-1000)
 	end
 end
 function c65030020.costfil(c)

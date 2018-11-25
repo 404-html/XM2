@@ -35,7 +35,7 @@ function cm.cfilter(c,tp)
 		and Duel.IsExistingMatchingCard(cm.filter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,c)
 end
 function cm.filter(c)
-	return c:IsSetCard(0xee7) and c:IsAbleToHand()
+	return c:IsSetCard(0xee7) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function cm.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then

@@ -72,7 +72,7 @@ function c2017.leave(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c2017.filter(c)
-	return (c:IsSetCard(0x203) or c:IsCode(2012)) and c:IsFaceup()
+	return (c:IsCode(2041) or c:IsCode(2012)) and c:IsFaceup()
 end
 function c2017.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and  c2017.filter(chkc) end

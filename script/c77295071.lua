@@ -29,7 +29,7 @@ function cm.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCountLimit(1,77295072)
 	e2:SetCost(cm.spcost)
-	e2:SetTarget(cm.destg)
+	e2:SetTarget(cm.dartg)
 	e2:SetOperation(cm.activate)
 	c:RegisterEffect(e2)
 	--to grave
@@ -92,9 +92,9 @@ end
 function cm.filter(c)
 	return c:IsType(TYPE_MONSTER)
 end
-function cm.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function cm.dartg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and cm.filter(chkc) and chkc~=e:GetHandler() end
-	if chk==0 then return Duel.IsExistingTarget(cm.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler()) end
+	if chk==0 then return Duel.IsExistingTarget(cm.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectTarget(tp,cm.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,e:GetHandler())
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
