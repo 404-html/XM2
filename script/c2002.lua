@@ -35,7 +35,7 @@ function c2002.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c2002.filter1(c)
-	return c:IsType(TYPE_MONSTER) and c:IsAbleToDeck()
+	return c:IsType(TYPE_MONSTER) and c:IsAbleToDeck() and (c:IsSetCard(0x200) or c:IsSetCard(0x202))
 end
 function c2002.tdcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end

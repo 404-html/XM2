@@ -2,7 +2,7 @@ local m=33339007
 local cm=_G["c"..m]
 cm.name="星锁少女 源星雨"
 --效 果 参 数 设 定
-cm.effect_atk=500   --攻 击 力 下 降 的 数 值
+cm.effect_atk=2000   --攻 击 力 下 降 的 数 值
 cm.effect_chain=4   --连 锁 N以 后 才 能 发 动
 
 cm.flag_atk=33339002	--攻 击 力 下 降 变 成 攻 击 力 上 升
@@ -27,7 +27,7 @@ function cm.initial_effect(c)
 	e4:SetDescription(aux.Stringid(m,2))
 	e4:SetCategory(CATEGORY_DISABLE)
 	e4:SetType(EFFECT_TYPE_QUICK_O)
-	e4:SetCode(EVENT_FREE_CHAIN)
+	e4:SetCode(EVENT_CHAINING)
 	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCountLimit(1,m)

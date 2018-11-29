@@ -15,7 +15,6 @@ function c17500019.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetCountLimit(1)
-	e1:SetCondition(c17500019.condition)
 	e1:SetTarget(c17500019.target)
 	e1:SetOperation(c17500019.operation)
 	c:RegisterEffect(e1)
@@ -33,9 +32,6 @@ function c17500019.spcon(e,c)
 	return Duel.IsExistingMatchingCard(c17500019.confil,tp,LOCATION_MZONE,0,1,nil)
 		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
-function c17500019.condition(e,tp,eg,ep,ev,re,r,rp)
-	return tp==Duel.GetTurnPlayer()
-end
 function c17500019.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsOnField() and chkc:IsFacedown() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsFacedown,tp,0,LOCATION_ONFIELD,1,nil) and Duel.GetLocationCount(tp,LOCATION_DECK)>0 end
@@ -43,14 +39,14 @@ function c17500019.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SelectTarget(tp,Card.IsFacedown,tp,0,LOCATION_ONFIELD,1,1,nil)
 end
 function c17500019.thfil(c,tc)
-	return bit.band(c:GetType(),tc:GetType())~=0 and c:IsAbleToHand()
+	return ((c:GetType()==TYPE_MONSTER and tc:GetType()==TYPE_MONSTER) or (c:GetType()==TYPE_SPELL and tc:GetType()==TYPE_SPELL) or (c:GetType()==TYPE_TRAP and tc:GetType()==TYPE_TRAP)) and c:IsAbleToHand()
 end
 function c17500019.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsFacedown() or not c:IsRelateToEffect(e) then return end
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) and tc:IsFacedown() then
-		if Duel.ConfirmCards(tp,tc)~=0 then
+		Duel.ConfirmCards(tp,tc)
 			local g=Duel.SelectMatchingCard(tp,c17500019.thfil,tp,LOCATION_DECK,0,1,1,nil,tc)
 			if g:GetCount()>0 then
 				Duel.SendtoHand(g,tp,REASON_EFFECT)
@@ -60,6 +56,5 @@ function c17500019.operation(e,tp,eg,ep,ev,re,r,rp)
 				Duel.ConfirmCards(1-tp,sg)
 				Duel.ShuffleDeck(tp)
 			end
-		end
 	end
 end

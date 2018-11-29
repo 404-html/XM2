@@ -99,7 +99,7 @@ function c2020.effectfilter2(e,c)
 	return c:IsSetCard(0x200) and c:IsType(TYPE_MONSTER)
 end
 function c2020.cfilter(c,tp)
-	return c:IsPreviousLocation(LOCATION_EXTRA) and c:GetPreviousControler()==tp
+	return c:IsPreviousLocation(LOCATION_EXTRA) and c:GetPreviousControler()==tp and c:IsSetCard(0x202)
 end
 function c2020.descon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c2020.cfilter,1,nil,tp)

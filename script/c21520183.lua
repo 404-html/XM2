@@ -83,11 +83,11 @@ end
 function c21520183.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	local g=Duel.GetMatchingGroup(c21520183.spfilter3,tp,LOCATION_MZONE+LOCATION_GRAVE+LOCATION_HAND,0,e:GetHandler())
+	local g=Duel.GetMatchingGroup(c21520183.spfilter3,tp,LOCATION_MZONE+LOCATION_GRAVE,0,e:GetHandler())
 	return g:IsExists(c21520183.spfilter1,3,nil) and g:GetCount()>=3
 end
 function c21520183.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g1=Duel.GetMatchingGroup(c21520183.spfilter3,tp,LOCATION_MZONE+LOCATION_GRAVE+LOCATION_HAND,0,e:GetHandler())
+	local g1=Duel.GetMatchingGroup(c21520183.spfilter3,tp,LOCATION_MZONE+LOCATION_GRAVE,0,e:GetHandler())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g2=g1:FilterSelect(tp,c21520183.spfilter1,3,3,nil)
 	g1:Sub(g2)
@@ -111,7 +111,7 @@ function c21520183.drop(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Draw(tp,1,REASON_EFFECT)
 end
 function c21520183.adval(e,c)
-	return Duel.GetMatchingGroupCount(Card.IsFaceup,c:GetControler(),LOCATION_REMOVED,LOCATION_REMOVED,nil)*400
+	return Duel.GetMatchingGroupCount(Card.IsFaceup,c:GetControler(),LOCATION_REMOVED,LOCATION_REMOVED,nil)*361
 end
 function c21520183.econ(e)
 	return e:GetHandler():GetOverlayCount()>0

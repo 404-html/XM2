@@ -18,7 +18,7 @@ function c44460077.initial_effect(c)
 end
 --sset
 function c44460077.setfilter(c)
-	return c:IsSetCard(0x679) and not c:IsForbidden() and c:IsType(SUMMON_MONSTER) 
+	return c:IsSetCard(0x679) and not c:IsForbidden() and c:IsType(TYPE_MONSTER) 
 end
 function c44460077.stg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=eg:GetFirst()

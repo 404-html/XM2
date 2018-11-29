@@ -18,7 +18,7 @@ function c44460076.initial_effect(c)
 end
 --sset
 function c44460076.setfilter(c)
-	return c:IsSetCard(0x680) and not c:IsForbidden() and c:IsType(SUMMON_MONSTER) 
+	return c:IsSetCard(0x680) and not c:IsForbidden() and c:IsType(TYPE_MONSTER) 
 end
 function c44460076.tfilter(c)
 	return c:IsSetCard(0x679) and c:IsAbleToGrave()

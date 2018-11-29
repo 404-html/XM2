@@ -14,7 +14,10 @@ function cm.initial_effect(c)
 	c:RegisterEffect(e1)	
 end
 function cm.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.IsExistingMatchingCard(Card.IsFaceup,tp,LOCATION_MZONE,0,1,nil)
+	return not Duel.IsExistingMatchingCard(cm.cfilter2,tp,LOCATION_MZONE,0,1,nil)
+end
+function cm.cfilter2(c)
+	return c:GetSequence()<5
 end
 function cm.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

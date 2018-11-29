@@ -2,7 +2,7 @@ local m=33339009
 local cm=_G["c"..m]
 cm.name="星锁迷云 星母"
 --效 果 参 数 设 定
-cm.effect_atk=500   --攻 击 力 下 降 的 数 值
+cm.effect_atk=2000   --攻 击 力 下 降 的 数 值
 cm.effect_chain=5   --连 锁 N才 能 发 动
 cm.effect_draw=1	--对 方 抽 卡 数
 cm.effect_deck=2	--盲 堆 数 量
@@ -41,7 +41,7 @@ function cm.initial_effect(c)
 	e4:SetDescription(aux.Stringid(m,2))
 	e4:SetCategory(CATEGORY_TOGRAVE+CATEGORY_DISABLE+CATEGORY_DECKDES)
 	e4:SetType(EFFECT_TYPE_QUICK_O)
-	e4:SetCode(EVENT_FREE_CHAIN)
+	e4:SetCode(EVENT_CHAINING)
 	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCountLimit(1,m)
