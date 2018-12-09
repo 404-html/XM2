@@ -31,6 +31,7 @@ end
 --xy
 function c44460035.xycost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,1000) end
+	Duel.ConfirmCards(1-tp,e:GetHandler())
 	Duel.PayLPCost(tp,1000)
 end
 function c44460035.tfilter(c)
@@ -76,5 +77,5 @@ function c44460035.con(e,tp,eg,ep,ev,re,r,rp)
 	and not Duel.IsExistingMatchingCard(c44460035.cfilter,tp,0,LOCATION_ONFIELD,1,nil)
 end
 function c44460035.aclimit(e,re,tp)
-	return re:IsActiveType(TYPE_MONSTER) 
+	return re:IsActiveType(TYPE_MONSTER) and not re:GetHandler():IsImmuneToEffect(e)
 end

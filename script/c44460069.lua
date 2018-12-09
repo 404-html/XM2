@@ -37,6 +37,7 @@ end
 --sy
 function c44460069.xycost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,1500) end
+	Duel.ConfirmCards(1-tp,e:GetHandler())
 	Duel.PayLPCost(tp,1500)
 end
 function c44460069.filter(c,tp)

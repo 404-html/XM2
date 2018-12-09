@@ -74,10 +74,12 @@ function c44460079.sfilter(c)
 	return bit.band(c:GetOriginalType(),TYPE_MONSTER)~=0 and c:IsSummonable(true,e)
 end
 function c44460079.tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c44460079.sfilter,tp,LOCATION_SZONE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c44460079.sfilter,tp,LOCATION_SZONE,0,1,nil)
+    and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
 	Duel.SetOperationInfo(0,CATEGORY_SUMMON,nil,1,0,0)
 end
 function c44460079.op(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SUMMON)
 	local g=Duel.SelectMatchingCard(tp,c44460079.sfilter,tp,LOCATION_SZONE,0,1,1,nil)
 	local tc=g:GetFirst()
@@ -90,10 +92,12 @@ function c44460079.sfilter2(c)
 	return c:GetLevel()==1 and c:IsSummonable(true,e) and c:IsType(TYPE_NORMAL)
 end
 function c44460079.tg2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c44460079.sfilter2,tp,LOCATION_HAND,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c44460079.sfilter2,tp,LOCATION_HAND,0,1,nil) 
+	and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
 	Duel.SetOperationInfo(0,CATEGORY_SUMMON,nil,1,0,0)
 end
 function c44460079.op2(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SUMMON)
 	local g=Duel.SelectMatchingCard(tp,c44460079.sfilter2,tp,LOCATION_HAND,0,1,1,nil)
 	local tc=g:GetFirst()

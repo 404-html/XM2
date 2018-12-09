@@ -19,7 +19,6 @@ function c44460119.initial_effect(c)
 	e2:SetCategory(CATEGORY_TODECK+CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetRange(LOCATION_ONFIELD)
-	e2:SetCountLimit(1,44460119)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetCondition(c44460119.condition)
     e2:SetTarget(c44460119.target)
@@ -32,6 +31,7 @@ end
 --xy
 function c44460119.xycost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,1000) end
+	Duel.ConfirmCards(1-tp,e:GetHandler())
 	Duel.PayLPCost(tp,1000)
 end
 function c44460119.xytg(e,tp,eg,ep,ev,re,r,rp,chk)

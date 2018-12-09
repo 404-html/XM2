@@ -2,8 +2,8 @@ local m=33339007
 local cm=_G["c"..m]
 cm.name="星锁少女 源星雨"
 --效 果 参 数 设 定
-cm.effect_atk=2000   --攻 击 力 下 降 的 数 值
-cm.effect_chain=4   --连 锁 N以 后 才 能 发 动
+cm.effect_atk=500   --攻 击 力 下 降 的 数 值
+cm.effect_chain=3   --连 锁 N以 后 才 能 发 动
 
 cm.flag_atk=33339002	--攻 击 力 下 降 变 成 攻 击 力 上 升
 cm.flag_chain=33339001  --连 锁 数 减 少 1

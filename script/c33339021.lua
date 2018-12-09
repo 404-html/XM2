@@ -44,10 +44,15 @@ function cm.initial_effect(c)
 	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCountLimit(1,m+1)
+	e4:SetLabel(2)
 	e4:SetCondition(cm.chaincon)
 	e4:SetTarget(cm.chaintg)
 	e4:SetOperation(cm.chainop)
 	c:RegisterEffect(e4)
+	local e5=e4:Clone()
+	e5:SetCode(EVENT_CHAINING)
+	e5:SetLabel(1)
+	c:RegisterEffect(e5)
 end
 function cm.isset(c)
 	return c:IsSetCard(cm.set_card) or c.isStarLock
@@ -102,7 +107,7 @@ function cm.chaincon(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) then return false end
 	local ct=1
 	if cm.flag_chain and Duel.IsPlayerAffectedByEffect(tp,cm.flag_chain) then ct=2 end
-	return Duel.GetCurrentChain()==cm.effect_chain-ct
+	return ct==e:GetLabel() and Duel.GetCurrentChain()==cm.effect_chain-ct
 end
 function cm.chaintg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cm.thfilter,tp,LOCATION_DECK,0,1,nil) end

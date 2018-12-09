@@ -143,8 +143,8 @@ function c40006877.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
 end
-function c40006877.spfilter(c)
-	return c:IsSetCard(0xdf1d) and c:IsType(TYPE_MONSTER) and not c:IsCode(40006877) 
+function c40006877.spfilter(c,e,tp)
+	return c:IsSetCard(0xdf1d) and c:IsType(TYPE_MONSTER) and not c:IsCode(40006877) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c40006877.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chkc then return chkc:GetLocation()==LOCATION_GRAVE and chkc:GetControler()==tp and c40006877.spfilter(chkc,e,tp) end

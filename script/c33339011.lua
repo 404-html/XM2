@@ -3,7 +3,7 @@ local cm=_G["c"..m]
 cm.name="星锁之环 跃迁之门"
 --效 果 参 数 设 定
 cm.effect_atk=500   --攻 击 力 下 降 的 数 值
-cm.effect_chain=5   --连 锁 N以 后 才 能 发 动
+cm.effect_chain=4   --连 锁 N以 后 才 能 发 动
 cm.effect_deck=2	--盲 堆 数 量
 
 cm.flag_atk=33339002	--攻 击 力 下 降 变 成 攻 击 力 上 升

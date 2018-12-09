@@ -29,11 +29,14 @@ function c21520093.initial_effect(c)
 	--indes
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_INDESTRUCTABLE)
+	e3:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCondition(c21520093.indes)
 	e3:SetValue(1)
 	c:RegisterEffect(e3)
+	local e3_1=e3:Clone()
+	e3_1:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	c:RegisterEffect(e3_1)
 	--def down
 	local e4=Effect.CreateEffect(c)
 	e4:SetCategory(CATEGORY_DEFCHANGE)
@@ -83,17 +86,23 @@ function c21520093.disop(e,tp,eg,ep,ev,re,r,rp)
 			tc=g:GetNext()
 		end
 	end
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetCode(EFFECT_CANNOT_ACTIVATE)
-	e1:SetTargetRange(1,1)
-	e1:SetValue(c21520093.aclimit)
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e1,tp)
+	--actlimit
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e2:SetCode(EFFECT_CANNOT_ACTIVATE)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetTargetRange(0,1)
+	e2:SetValue(c21520093.aclimit)
+	e2:SetCondition(c21520093.actcon)
+	e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+	c:RegisterEffect(e2)
 end
 function c21520093.aclimit(e,re,tp)
-	return re:IsActiveType(TYPE_SPELL+TYPE_TRAP)
+	return not re:GetHandler():IsImmuneToEffect(e)
+end
+function c21520093.actcon(e)
+	return Duel.GetAttacker()==e:GetHandler() or Duel.GetAttackTarget()==e:GetHandler()
 end
 function c21520093.atkfilter(e,c)
 	return e:GetHandler():IsRelateToCard(c) --c:GetFlagEffect(21520093)~=0
@@ -154,7 +163,7 @@ function c21520093.resetop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c21520093.indes(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:GetDefense()>0
+	return c:GetDefense()>0 and c:IsFaceup()
 end
 function c21520093.dcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp

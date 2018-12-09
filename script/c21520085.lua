@@ -77,7 +77,18 @@ function c21520085.adop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCode(EFFECT_SET_BASE_DEFENSE)
 		e2:SetValue(def)
 		c:RegisterEffect(e2)
+		local g=Duel.GetMatchingGroup(c21520085.tdfilter,tp,LOCATION_GRAVE,0,nil,c:GetAttack())
+		if g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(21520085,3)) then
+			Duel.BreakEffect()
+			Duel.PayLPCost(tp,math.floor(Duel.GetLP(tp)/2))
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+			local sg=g:Select(tp,1,c::GetMaterialCount(),nil)
+			Duel.SendtoDeck(sg,nil,2,REASON_EFFECT)
+		end
 	end
+end
+function c21520085.tdfilter(c,atk)
+	return c:IsAbleToDeck() --and c:IsAttackBelow(atk) and c:IsType(TYPE_MONSTER) and not c:IsAttribute(ATTRIBUTE_DARK)
 end
 function c21520085.atkval(e,c)
 	return Duel.GetMatchingGroupCount(Card.IsAttribute,e:GetHandlerPlayer(),LOCATION_GRAVE,0,nil,ATTRIBUTE_DARK)*100
