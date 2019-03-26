@@ -16,7 +16,7 @@ function c17500005.damfil(c)
 	return c:IsRace(RACE_SPELLCASTER) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsFaceup()
 end
 function c17500005.con(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c17500004.damfil,tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(c17500005.damfil,tp,LOCATION_MZONE,0,1,nil)
 end
 function c17500005.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end

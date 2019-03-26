@@ -1,56 +1,45 @@
---元素法师们的晚自习
-function c17500016.initial_effect(c)
-	--Activate
-	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetOperation(c17500016.activate)
-	c:RegisterEffect(e1)
-	--tohand
-	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetRange(LOCATION_SZONE)
-	e2:SetCountLimit(1)
-	e2:SetCost(c17500016.cost)
-	e2:SetTarget(c17500016.tg)
-	e2:SetOperation(c17500016.op)
-	c:RegisterEffect(e2)
+--大地元素法师 奥丝
+if not pcall(function() require("expansions/script/c10199990") end) then require("script/c10199990") end
+local m=17500016
+local cm=_G["c"..m]
+function cm.initial_effect(c)
+	c:EnableReviveLimit()
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_SPELLCASTER),4,2)
+	local e1=rsef.STO(c,EVENT_SPSUMMON_SUCCESS,{m,0},nil,"se,th,sp",nil,nil,rscost.rmxyzs(1),cm.tg,cm.op)
+	local e2=rsef.I(c,{m,1},1,"tg",EFFECT_FLAG_NO_TURN_RESET,LOCATION_MZONE,nil,rscost.rmxyzs(true),cm.tg2,cm.op2)
 end
-c17500016.setname="ElementalWizard"
-function c17500016.thfilter(c)
-	return c.setname=="ElementalSpell" and c:IsAbleToHand()
+cm.setname="ElementalWizard"
+function cm.tg2(e,tp,eg,ep,ev,re,r,rp,chk)
+	local ct=e:GetHandler():GetOverlayCount()
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGrave,tp,0,LOCATION_ONFIELD,ct,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,ct,1-tp,LOCATION_ONFIELD)
 end
-function c17500016.activate(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local g=Duel.GetMatchingGroup(c17500016.thfilter,tp,LOCATION_DECK,0,nil)
-	if g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(17500016,0)) then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-		local sg=g:Select(tp,1,1,nil)
-		Duel.SendtoHand(sg,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,sg)
+function cm.op2(e,tp,eg,ep,ev,re,r,rp)
+	local ct=e:GetLabel()
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToGrave,tp,0,LOCATION_ONFIELD,ct,ct,nil)
+	if #g>0 then
+		Duel.HintSelection(g)
+		Duel.SendtoGrave(g,REASON_EFFECT)
 	end
 end
-function c17500016.costfil(c)
-	return c.setname=="ElementalSpell" and c:IsAbleToGraveAsCost()
+function cm.thfilter(c)
+	return c:IsAbleToHand() and c.setname=="ElementalSpell"
 end
-function c17500016.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c17500016.costfil,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,nil) end
-	local g=Duel.SelectMatchingCard(tp,c17500016.costfil,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,1,nil)
-	Duel.SendtoGrave(g,REASON_COST)
+function cm.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(cm.thfilter,tp,LOCATION_DECK,0,1,nil) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(Card.IsCanBeSpecialSummoned,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil,e,0,tp,false,false) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,PLAYER_ALL,LOCATION_GRAVE)
 end
-function c17500016.thfil(c)
-	return c.setname=="ElementalWizard" and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
-end
-function c17500016.tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c17500016.thfil,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
-end
-function c17500016.op(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.SelectMatchingCard(tp,c17500016.thfil,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
-	if g:GetCount()>0 then
-		Duel.SendtoHand(g,tp,REASON_EFFECT)
-		Duel.ConfirmCards(tp,g)
+function cm.op(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,cm.thfilter,tp,LOCATION_DECK,0,1,1,nil)
+	if #g>0 and Duel.SendtoHand(g,nil,REASON_EFFECT)~=0 then
+		Duel.ConfirmCards(1-tp,g)
+		if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(Card.IsCanBeSpecialSummoned,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil,e,0,tp,false,false) then
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+			local sg=Duel.SelectMatchingCard(tp,Card.IsCanBeSpecialSummoned,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil,e,0,tp,false,false)
+			rssf.SpecialSummon(sg)
+		end
 	end
 end

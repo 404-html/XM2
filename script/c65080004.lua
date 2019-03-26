@@ -40,7 +40,7 @@ function c65080004.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 
 function c65080004.spfil(c,e,tp)
-	return c:IsAttribute(ATTRIBUTE_WATER) and c:IsLevelBelow(4) and c:IsRace(RACE_WINDBEAST+RACE_SPELLCASTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsAttribute(ATTRIBUTE_WATER) and c:IsLevel(4) and c:IsRace(RACE_WINDBEAST+RACE_SPELLCASTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 
 function c65080004.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -57,7 +57,7 @@ function c65080004.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function c65080004.filter(c)
-	return c:IsLevelBelow(4) and c:IsAttribute(ATTRIBUTE_WATER) and c:IsAbleToHand()
+	return c:IsLevel(4) and c:IsAttribute(ATTRIBUTE_WATER) and c:IsAbleToHand() and (c:IsRace(RACE_SPELLCASTER) or c:IsRace(RACE_WINDBEAST))
 end
 function c65080004.sumtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingTarget(c65080004.filter,tp,LOCATION_DECK,0,1,nil,e,tp) end

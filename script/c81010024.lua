@@ -1,62 +1,88 @@
---十时爱梨
+--七大爱好 打call
 function c81010024.initial_effect(c)
-    c:EnableReviveLimit()
-    --cannot special summon
-    local e1=Effect.CreateEffect(c)
-    e1:SetType(EFFECT_TYPE_SINGLE)
-    e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-    e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-    e1:SetValue(aux.FALSE)
-    c:RegisterEffect(e1)
-    --spsummon
-    local e2=Effect.CreateEffect(c)
-    e2:SetType(EFFECT_TYPE_FIELD)
-    e2:SetCode(EFFECT_SPSUMMON_PROC)
-    e2:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-    e2:SetRange(LOCATION_HAND)
-    e2:SetCondition(c81010024.spcon)
-    c:RegisterEffect(e2)
-    --to hand
-    local e3=Effect.CreateEffect(c)
-    e3:SetDescription(aux.Stringid(81010024,0))
-    e3:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
-    e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-    e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-    e3:SetCountLimit(1,81010024)
-    e3:SetTarget(c81010024.thtg)
-    e3:SetOperation(c81010024.thop)
-    c:RegisterEffect(e3)
-    --spsummon limit
-    local e4=Effect.CreateEffect(c)
-    e4:SetType(EFFECT_TYPE_FIELD)
-    e4:SetRange(LOCATION_MZONE)
-    e4:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-    e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-    e4:SetTargetRange(1,0)
-    e4:SetTarget(c81010024.sumlimit)
-    c:RegisterEffect(e4)
+	--Activate
+	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_EQUIP)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetTarget(c81010024.target)
+	e1:SetOperation(c81010024.operation)
+	c:RegisterEffect(e1)
+	--Atk,race
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_EQUIP)
+	e2:SetCode(EFFECT_CHANGE_RACE)
+	e2:SetValue(RACE_SPELLCASTER)
+	c:RegisterEffect(e2)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_EQUIP)
+	e3:SetCode(EFFECT_UPDATE_ATTACK)
+	e3:SetValue(1000)
+	c:RegisterEffect(e3)
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_EQUIP)
+	e4:SetCode(EFFECT_UPDATE_DEFENSE)
+	e4:SetValue(1000)
+	c:RegisterEffect(e4)
+	--Equip limit
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetCode(EFFECT_EQUIP_LIMIT)
+	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e4:SetValue(1)
+	c:RegisterEffect(e4)
+	--leave
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e5:SetCode(EVENT_LEAVE_FIELD)
+	e5:SetCondition(c81010024.atkcon)
+	e5:SetOperation(c81010024.atkop)
+	c:RegisterEffect(e5)
 end
-function c81010024.spcon(e,c)
-    if c==nil then return true end
-    local tp=c:GetControler()
-    return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-        and Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_GRAVE,0,8,nil,TYPE_MONSTER)
+function c81010024.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
+	Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
 end
-function c81010024.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-    if chk==0 then return true end
-    Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+function c81010024.operation(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if e:GetHandler():IsRelateToEffect(e) and tc:IsRelateToEffect(e) and tc:IsFaceup() then
+		Duel.Equip(tp,e:GetHandler(),tc)
+	end
 end
-function c81010024.thfilter(c)
-    return c:IsAttackAbove(2000) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+function c81010024.atkcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local tc=c:GetFirstCardTarget()
+	if tc and tc:IsLocation(LOCATION_MZONE) and tc:IsFaceup() then
+		e:SetLabelObject(tc)
+		tc:CreateEffectRelation(e)
+		return true
+	else return false end
 end
-function c81010024.thop(e,tp,eg,ep,ev,re,r,rp)
-    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-    local g=Duel.SelectMatchingCard(tp,c81010024.thfilter,tp,LOCATION_DECK,0,1,1,nil)
-    if g:GetCount()>0 then
-        Duel.SendtoHand(g,nil,REASON_EFFECT)
-        Duel.ConfirmCards(1-tp,g)
-    end
-end
-function c81010024.sumlimit(e,c,sump,sumtype,sumpos,targetp)
-    return c:IsLocation(LOCATION_EXTRA)
+function c81010024.atkop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local tc=e:GetLabelObject()
+	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_CHANGE_LEVEL)
+		e1:SetValue(5)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		tc:RegisterEffect(e1)
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_SET_ATTACK_FINAL)
+		e2:SetValue(1350)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+		tc:RegisterEffect(e2)
+		local e3=Effect.CreateEffect(c)
+		e3:SetType(EFFECT_TYPE_SINGLE)
+		e3:SetCode(EFFECT_SET_DEFENSE_FINAL)
+		e3:SetValue(1200)
+		e3:SetReset(RESET_EVENT+RESETS_STANDARD)
+		tc:RegisterEffect(e3)
+	end
 end

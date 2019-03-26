@@ -5,19 +5,6 @@ function c65080009.initial_effect(c)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
 	e0:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e0)
-	--spsummon
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(65080009,0))
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e1:SetRange(LOCATION_FZONE)
-	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_DELAY)
-	e1:SetCountLimit(1)
-	e1:SetCondition(c65080009.spcon)
-	e1:SetTarget(c65080009.sptg)
-	e1:SetOperation(c65080009.spop)
-	c:RegisterEffect(e1)
 	--counter
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(65080009,1))
@@ -25,7 +12,6 @@ function c65080009.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetRange(LOCATION_FZONE)
 	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetCountLimit(1,65080009)
 	e2:SetTarget(c65080009.cttg)
 	e2:SetOperation(c65080009.ctop)
 	c:RegisterEffect(e2)
@@ -71,26 +57,5 @@ function c65080009.ctop(e,tp,eg,ep,ev,re,r,rp)
 		if tc then
 			Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 		end
-	end
-end
-
-function c65080009.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(Card.IsAttribute,1,nil,ATTRIBUTE_WATER)
-end
-
-function c65080009.spfil(c,e,tp)
-	return c:IsRace(RACE_WINDBEAST) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
-
-function c65080009.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(c65080009.spfil,tp,LOCATION_HAND+LOCATION_GRAVE+LOCATION_DECK,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_GRAVE+LOCATION_DECK)
-end
-
-function c65080009.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	local g=Duel.SelectMatchingCard(tp,c65080009.spfil,tp,LOCATION_HAND+LOCATION_GRAVE+LOCATION_DECK,0,1,1,nil,e,tp)
-	if g:GetCount()>0 then
-		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end

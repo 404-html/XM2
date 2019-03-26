@@ -1,80 +1,107 @@
---tricoro·高垣枫
+--芳香新人-夕美
 function c81019009.initial_effect(c)
-	--xyz summon
-	aux.AddXyzProcedure(c,nil,7,3,c81019009.ovfilter,aux.Stringid(81019009,0))
 	c:EnableReviveLimit()
-	--battle
+	aux.AddXyzProcedure(c,nil,7,2,nil,nil,99)
+	--lv change
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_BATTLED)
-	e1:SetOperation(c81019009.baop)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_XYZ_LEVEL)
+	e1:SetProperty(EFFECT_FLAG_SET_AVAIABLE)
+	e1:SetRange(LOCATION_EXTRA)
+	e1:SetTargetRange(LOCATION_MZONE,0)
+	e1:SetTarget(c81019009.lvtg)
+	e1:SetValue(c81019009.lvval)
 	c:RegisterEffect(e1)
-	--draw
+	--indes
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetTargetRange(LOCATION_MZONE,0)
+	e2:SetCondition(c81019009.indcon)
+	e2:SetTarget(c81019009.indtg)
+	e2:SetValue(1)
+	c:RegisterEffect(e2)
+	--to hand
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(81019009,2))
-	e3:SetCategory(CATEGORY_DRAW)
-	e3:SetType(EFFECT_TYPE_IGNITION)
-	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e3:SetCategory(CATEGORY_TODECK)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e3:SetCode(EVENT_RECOVER)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCountLimit(1,81019009)
-	e3:SetCost(c81019009.drcost)
-	e3:SetTarget(c81019009.drtg)
-	e3:SetOperation(c81019009.drop)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e3:SetCountLimit(1)
+	e3:SetCondition(c81019009.thcon)
+	e3:SetTarget(c81019009.thtg)
+	e3:SetOperation(c81019009.thop)
 	c:RegisterEffect(e3)
+	--set
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_IGNITION)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetCountLimit(1,81019009)
+	e4:SetCost(c81019009.setcost)
+	e4:SetTarget(c81019009.settg)
+	e4:SetOperation(c81019009.setop)
+	c:RegisterEffect(e4)
 end
-function c81019009.ovfilter(c)
-	return c:IsFaceup() and c:IsLink(1) and c:IsType(TYPE_MONSTER) and c:IsType(TYPE_LINK)
+function c81019009.lvtg(e,c)
+	return c:IsLevelAbove(1) and c:IsSetCard(0xc9)
 end
-function c81019009.baop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local d=c:GetBattleTarget()
-	if d and c:IsFaceup() and not c:IsStatus(STATUS_DESTROY_CONFIRMED) and d:IsStatus(STATUS_BATTLE_DESTROYED) then
-		local e1=Effect.CreateEffect(c)
-		e1:SetCode(EFFECT_SEND_REPLACE)
-		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-		e1:SetTarget(c81019009.reptg)
-		e1:SetOperation(c81019009.repop)
-		e1:SetLabelObject(c)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
-		d:RegisterEffect(e1)
+function c81019009.lvval(e,c,rc)
+	local lv=c:GetLevel()
+	if rc==e:GetHandler() then return 7
+	else return lv end
+end
+function c81019009.indcon(e,tp,eg,ep,ev,re,r,rp)
+	local tp=e:GetHandlerPlayer()
+	return Duel.GetLP(tp)>Duel.GetLP(1-tp)
+end
+function c81019009.indtg(e,c)
+	return c:IsRace(RACE_PLANT)
+end
+function c81019009.thcon(e,tp,eg,ep,ev,re,r,rp)
+	return ep==tp
+end
+function c81019009.thfilter(c)
+	return c:IsAbleToDeck()
+end
+function c81019009.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and c81019009.thfilter(chkc) end
+	if chk==0 then return true end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	local g=Duel.SelectTarget(tp,c81019009.thfilter,tp,0,LOCATION_ONFIELD,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,g:GetCount(),0,0)
+end
+function c81019009.thop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if tc and tc:IsRelateToEffect(e) then
+		Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)
 	end
 end
-function c81019009.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:GetDestination()==LOCATION_GRAVE and c:IsReason(REASON_BATTLE) and not c:IsImmuneToEffect(e) end
-	return true
+function c81019009.setcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
-function c81019009.repop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local og=c:GetOverlayGroup()
-		 if og:GetCount()>0 then
-			Duel.SendtoGrave(og,REASON_RULE)
-		 end
-	Duel.Overlay(e:GetLabelObject(),Group.FromCards(c))
+function c81019009.setfilter(c)
+	return c:IsCode(28265983,92266279) and c:IsSSetable(true)
 end
-function c81019009.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,2,REASON_COST) end
-	e:GetHandler():RemoveOverlayCard(tp,2,2,REASON_COST)
+function c81019009.settg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>-1
+		and Duel.IsExistingMatchingCard(c81019009.setfilter,tp,LOCATION_DECK,0,1,nil) end
 end
-function c81019009.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,3) end
-	Duel.SetTargetPlayer(tp)
-	Duel.SetTargetParam(3)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,3)
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,0,tp,2)
-end
-function c81019009.drop(e,tp,eg,ep,ev,re,r,rp)
-	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-	if Duel.Draw(p,d,REASON_EFFECT)==3 then
-		local g=Duel.GetMatchingGroup(Card.IsAbleToDeck,p,LOCATION_HAND,0,nil)
-		if g:GetCount()==0 then return end
-		Duel.Hint(HINT_SELECTMSG,p,HINTMSG_TODECK)
-		local sg=g:Select(p,2,2,nil)
-		Duel.SendtoDeck(sg,nil,0,REASON_EFFECT)
-		Duel.SortDecktop(p,p,2)
-		for i=1,2 do
-			local mg=Duel.GetDecktopGroup(p,1)
-			Duel.MoveSequence(mg:GetFirst(),1)
-		end
+function c81019009.setop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
+	local g=Duel.SelectMatchingCard(tp,c81019009.setfilter,tp,LOCATION_DECK,0,1,1,nil)
+	local tc=g:GetFirst()
+	if g:GetCount()>0 then
+		Duel.SSet(tp,tc)
+		Duel.ConfirmCards(1-tp,tc)
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
+		e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		tc:RegisterEffect(e1)
 	end
 end

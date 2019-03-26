@@ -1,87 +1,68 @@
---Wings·最上静香
+--万圣节·篠宫可怜
 function c81013005.initial_effect(c)
+	--synchro summon
+	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_SPELLCASTER),aux.NonTuner(Card.IsRace,RACE_SPELLCASTER),1)
 	c:EnableReviveLimit()
-	aux.AddFusionProcCodeFun(c,81013000,c81013005.matfilter,1,true,true)
-	--spsummon condition
+	c:EnableCounterPermit(0x1)
+	--indes
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(c81013005.splimit)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetValue(aux.indoval)
 	c:RegisterEffect(e1)
-	--special summon rule
+	--add counter
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(81013005,1))
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_SPSUMMON_PROC)
-	e2:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-	e2:SetRange(LOCATION_EXTRA)
-	e2:SetCondition(c81013005.sprcon)
-	e2:SetOperation(c81013005.sprop)
+	e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e2:SetCode(EVENT_CHAINING)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetOperation(aux.chainreg)
 	c:RegisterEffect(e2)
-	--to grave
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(81013005,0))
-	e3:SetCategory(CATEGORY_REMOVE)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e3:SetCode(EVENT_BATTLE_DAMAGE)
-	e3:SetCondition(c81013005.tgcon)
-	e3:SetTarget(c81013005.tgtg)
-	e3:SetOperation(c81013005.tgop)
+	e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+	e3:SetCode(EVENT_CHAIN_SOLVING)
+	e3:SetProperty(EFFECT_FLAG_DELAY)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetOperation(c81013005.acop)
 	c:RegisterEffect(e3)
+	--token
+	local e4=Effect.CreateEffect(c)
+	e4:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN)
+	e4:SetType(EFFECT_TYPE_IGNITION)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetCountLimit(1,81013005)
+	e4:SetCost(c81013005.tkcost)
+	e4:SetTarget(c81013005.tktg)
+	e4:SetOperation(c81013005.tkop)
+	c:RegisterEffect(e4)
 end
-function c81013005.matfilter(c)
-	return c:IsLevel(1) and c:IsRace(RACE_FAIRY) and c:IsAbleToDeckOrExtraAsCost()
-end
-function c81013005.splimit(e,se,sp,st)
-	return e:GetHandler():GetLocation()~=LOCATION_EXTRA
-end
-function c81013005.cfilter(c)
-	return (c:IsFusionCode(81013000) or c81013005.matfilter(c))
-		and c:IsCanBeFusionMaterial() and c:IsAbleToDeckOrExtraAsCost()
-end
-function c81013005.spfilter1(c,tp,g)
-	return g:IsExists(c81013005.spfilter2,1,c,tp,c)
-end
-function c81013005.spfilter2(c,tp,mc)
-	return (c:IsFusionCode(81013000) and c81013005.matfilter(c) and mc:IsType(TYPE_MONSTER)
-		or c81013005.matfilter(c) and c:IsType(TYPE_MONSTER) and mc:IsFusionCode(81013000))
-		and Duel.GetLocationCountFromEx(tp,tp,Group.FromCards(c,mc))>0
-end
-function c81013005.sprcon(e,c)
-	if c==nil then return true end
-	local tp=c:GetControler()
-	local g=Duel.GetMatchingGroup(c81013005.cfilter,tp,LOCATION_ONFIELD,0,nil)
-	return g:IsExists(c81013005.spfilter1,1,nil,tp,g)
-end
-function c81013005.sprop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.GetMatchingGroup(c81013005.cfilter,tp,LOCATION_ONFIELD,0,nil)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g1=g:FilterSelect(tp,c81013005.spfilter1,1,1,nil,tp,g)
-	local mc=g1:GetFirst()
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g2=g:FilterSelect(tp,c81013005.spfilter2,1,1,mc,tp,mc)
-	g1:Merge(g2)
-	local cg=g1:Filter(Card.IsFacedown,nil)
-	if cg:GetCount()>0 then
-		Duel.ConfirmCards(1-tp,cg)
+function c81013005.acop(e,tp,eg,ep,ev,re,r,rp)
+	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) and e:GetHandler():GetFlagEffect(1)>0 then
+		e:GetHandler():AddCounter(0x1,2)
 	end
-	Duel.SendtoDeck(g1,nil,2,REASON_COST)
 end
-function c81013005.tgcon(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp
+function c81013005.tkcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,0x1,6,REASON_COST) end
+	Duel.RemoveCounter(tp,1,0,0x1,6,REASON_COST)
 end
-function c81013005.tgtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(1-tp) and chkc:IsOnField() and chkc:IsAbleToGrave() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToGrave,tp,0,LOCATION_ONFIELD,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectTarget(tp,Card.IsAbleToGrave,tp,0,LOCATION_ONFIELD,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,1,0,0)
+function c81013005.tktg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,81013006,0,0x4011,3000,2500,8,RACE_FAIRY,ATTRIBUTE_WIND) end
+	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
 end
-function c81013005.tgop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
-		Duel.Remove(tc,POS_FACEDOWN,REASON_EFFECT)
-	end
+function c81013005.tkop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
+		or not Duel.IsPlayerCanSpecialSummonMonster(tp,81013006,0,0x4011,3000,2500,8,RACE_FAIRY,ATTRIBUTE_WIND) then return end
+	local token=Duel.CreateToken(tp,81013006)
+	Duel.SpecialSummon(token,0,tp,tp,false,false,POS_FACEUP)
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+	e1:SetValue(1)
+	token:RegisterEffect(e1,true)
 end

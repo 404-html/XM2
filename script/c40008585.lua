@@ -26,7 +26,7 @@ function c40008585.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function c40008585.filter(c,e,tp)
-	return c:IsSetCard(0xf016) and c:IsRace(RACE_REPTILE) and c:IsLevelAbove(5) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0xc016) and c:IsRace(RACE_REPTILE) and c:IsLevelAbove(5) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c40008585.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
@@ -42,7 +42,7 @@ function c40008585.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c40008585.cfilter(c)
-	return c:IsSetCard(0xf016) and c:IsAbleToRemoveAsCost() and not c:IsCode(40008585)
+	return c:IsSetCard(0xc016) and c:IsAbleToRemoveAsCost() and not c:IsCode(40008585)
 end
 function c40008585.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost()

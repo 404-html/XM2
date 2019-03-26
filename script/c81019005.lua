@@ -1,27 +1,53 @@
---超市采购
+--tricoro·乙仓悠贵·SIRIUS
 function c81019005.initial_effect(c)
-	--Activate
-	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_DRAW)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCountLimit(1,81019005+EFFECT_COUNT_CODE_OATH)
-	e1:SetCondition(c81019005.condition)
-	e1:SetTarget(c81019005.target)
-	e1:SetOperation(c81019005.activate)
-	c:RegisterEffect(e1)
+	c:EnableReviveLimit()
+	--to hand
+	local e0=Effect.CreateEffect(c)
+	e0:SetCategory(CATEGORY_TOHAND)
+	e0:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e0:SetCode(EVENT_BATTLE_DAMAGE)
+	e0:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e0:SetCountLimit(1,81019005)
+	e0:SetCondition(c81019005.thcon)
+	e0:SetTarget(c81019005.thtg)
+	e0:SetOperation(c81019005.thop)
+	c:RegisterEffect(e0)
+	--counter
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetOperation(c81019005.ctop)
+	c:RegisterEffect(e2)
 end
-function c81019005.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)==0
+function c81019005.addc(e,tp,eg,ep,ev,re,r,rp)
+	if ep~=tp then
+		Duel.Hint(HINT_CARD,0,81019005)
+		Duel.Damage(1-tp,200,REASON_EFFECT)
+	end
 end
-function c81019005.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,2) end
-	Duel.SetTargetPlayer(tp)
-	Duel.SetTargetParam(2)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
+function c81019005.thcon(e,tp,eg,ep,ev,re,r,rp)
+	return ep~=tp
 end
-function c81019005.activate(e,tp,eg,ep,ev,re,r,rp)
-	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-	Duel.Draw(p,d,REASON_EFFECT)
+function c81019005.thfilter(c)
+	return c:IsSetCard(0xfb) and c:IsFaceup() and c:IsAbleToHand()
+end
+function c81019005.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_REMOVED) and c81019005.thfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c81019005.thfilter,tp,LOCATION_REMOVED,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectTarget(tp,c81019005.thfilter,tp,LOCATION_REMOVED,0,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
+end
+function c81019005.thop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) then
+		Duel.SendtoHand(tc,nil,REASON_EFFECT)
+	end
+end
+function c81019005.ctop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetAttacker():IsControler(1-tp) then
+		Duel.Hint(HINT_CARD,0,81019005)
+		Duel.Damage(1-tp,200,REASON_EFFECT)
+	end
 end

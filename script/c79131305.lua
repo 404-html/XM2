@@ -1,76 +1,87 @@
---灵噬先锋官 郝尔
+--灵噬·鬼
 function c79131305.initial_effect(c)
-	--XYZ material
-	c:EnableReviveLimit()
-	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x1201),4,2)
-	--destroy replace
+	--search
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_COUNTER)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e1:SetCode(EFFECT_DESTROY_REPLACE)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetTarget(c79131305.reptg)
-	e1:SetOperation(c79131305.repop)
+	e1:SetDescription(aux.Stringid(79131305,0))
+	e1:SetCategory(CATEGORY_REMOVE)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetCode(EVENT_SUMMON_SUCCESS)
+	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e1:SetCountLimit(1,79131305)
+	e1:SetTarget(c79131305.target)
+	e1:SetOperation(c79131305.operation)
 	c:RegisterEffect(e1)
-	--remove
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(79131305,0))
-	e2:SetCategory(CATEGORY_REMOVE)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_DAMAGE_STEP_END)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCondition(c79131305.rmcon)
-	e2:SetCost(c79131305.rmcost)
-	e2:SetOperation(c79131305.rmop)
+	local e2=e1:Clone()
+	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e2)
-	--to hand
+	--special summon
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(79131305,1))
-	e3:SetCategory(CATEGORY_TOHAND)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
-	e3:SetCode(EVENT_REMOVE)
-	e3:SetCost(c79131305.thtg)
-	e3:SetOperation(c79131305.thop)
+	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e3:SetType(EFFECT_TYPE_IGNITION)
+	e3:SetRange(LOCATION_GRAVE)
+	e3:SetCountLimit(1,79131306)
+	e3:SetCost(c79131305.spcost)
+	e3:SetTarget(c79131305.sptg)
+	e3:SetOperation(c79131305.spop)
 	c:RegisterEffect(e3)
+	--tohand
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(79131305,2))
+	e4:SetCategory(CATEGORY_TOGRAVE+CATEGORY_SEARCH)
+	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e4:SetCode(EVENT_REMOVE)
+	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e4:SetCountLimit(1,79131305)
+	e4:SetTarget(c79131305.thtg1)
+	e4:SetOperation(c79131305.thop1)
+	c:RegisterEffect(e4)
 end
-function c79131305.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsCanRemoveCounter(tp,LOCATION_ONFIELD,LOCATION_ONFIELD,0x1206,1,REASON_COST) end
-	return Duel.SelectEffectYesNo(tp,e:GetHandler(),96)
+function c79131305.filter(c)
+	return c:IsSetCard(0x1204) and c:IsType(TYPE_MONSTER) and c:IsAbleToRemove()
 end
-function c79131305.repop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.RemoveCounter(tp,LOCATION_ONFIELD,LOCATION_ONFIELD,0x1206,1,REASON_COST)
+function c79131305.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chk==0 then return Duel.IsExistingMatchingCard(c79131305.filter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,LOCATION_DECK)
 end
-function c79131305.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
-	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
-end
-function c79131305.rmcon(e,tp,eg,ep,ev,re,r,rp)
-	local a=Duel.GetAttacker()
-	local at=Duel.GetAttackTarget()
-	return at and a==e:GetHandler() and at:IsRelateToBattle() 
-end
-function c79131305.rmop(e,tp,eg,ep,ev,re,r,rp)
-	local at=Duel.GetAttackTarget()
-	if at:IsRelateToBattle() and not at:IsImmuneToEffect(e) and at:IsAbleToRemove() and e:GetHandler():IsRelateToEffect(e) then
-		Duel.Remove(at,POS_FACEUP,REASON_EFFECT)
+function c79131305.operation(e,tp,eg,ep,ev,re,r,rp,chk)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+	local g=Duel.SelectMatchingCard(tp,c79131305.filter,tp,LOCATION_DECK,0,1,1,nil)
+	if g:GetCount()>0 then
+		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 	end
 end
-function c79131305.thfilter(c)
-	return c:IsSetCard(0x1201) and c:IsAbleToHand() and c:IsType(TYPE_MONSTER) and not c:IsCode(79131305) 
+function c79131305.costfilter(c)
+	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x1204) and c:IsAbleToRemoveAsCost()
 end
-function c79131305.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return c79131305.thfilter(chkc) and chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) end
-	if chk==0 then return Duel.IsExistingTarget(c79131305.thfilter,tp,LOCATION_REMOVED,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectTarget(tp,c79131305.thfilter,tp,LOCATION_REMOVED,0,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,tp,LOCATION_REMOVED)
+function c79131305.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c79131305.costfilter,tp,LOCATION_GRAVE,0,1,e:GetHandler()) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+	local g=Duel.SelectMatchingCard(tp,c79131305.costfilter,tp,LOCATION_GRAVE,0,1,1,e:GetHandler())
+	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
-function c79131305.thop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
-		Duel.SendtoHand(tc,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,tc)
+function c79131305.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+end
+function c79131305.spop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) then
+		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	end
+end
+function c79131305.thfilter1(c)
+	return c:IsSetCard(0x1204) and c:IsType(TYPE_MONSTER) and c:IsAbleToGrave()
+end
+function c79131305.thtg1(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c79131305.thfilter1,tp,LOCATION_DECK,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
+end
+function c79131305.thop1(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local g=Duel.SelectMatchingCard(tp,c79131305.thfilter1,tp,LOCATION_DECK,0,1,1,nil)
+	if g:GetCount()>0 then
+		Duel.SendtoGrave(g,nil,REASON_EFFECT)
 	end
 end

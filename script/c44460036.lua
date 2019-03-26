@@ -57,7 +57,7 @@ function c44460036.xyop(e,tp,eg,ep,ev,re,r,rp)
 	    c:RegisterEffect(e1)
 end
 function c44460036.climit(e,lp,tp)
-	return e:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_MONSTER) 
+	return e:IsHasType(EFFECT_TYPE_ACTIVATE) 
 end
 --kill hand
 function c44460036.hdtg(e,tp,eg,ep,ev,re,r,rp,chk)

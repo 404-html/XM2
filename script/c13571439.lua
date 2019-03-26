@@ -27,11 +27,11 @@ function cm.initial_effect(c)
 end
 --Link
 function cm.mfilter(c)
-	return not c:IsLinkType(TYPE_TOKEN)
+	return c:IsLevelAbove(5)
 end
 --To Grave
 function cm.filter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsAbleToGrave()
+	return c:IsLevelAbove(5) and c:IsType(TYPE_MONSTER) and c:IsAbleToGrave()
 end
 function cm.attrfilter(c)
 	return c:IsType(TYPE_MONSTER)

@@ -47,7 +47,7 @@ function c44460150.initial_effect(c)
 end
 --indes
 function c44460150.indtg(e,c)
-	return (c:IsSetCard(0x677) or c:IsSetCard(0x679)) and c~=e:GetHandler()
+	return (c:IsSetCard(0x680) or c:IsSetCard(0x679)) and c~=e:GetHandler()
 end
 function c44460150.atarget(e,c)
 	return c:IsType(TYPE_EFFECT) 
@@ -57,7 +57,7 @@ function c44460150.cfilter(c)
 	return c:IsFaceup() and c:IsCode(44460054)
 end
 function c44460150.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c44460150.cfilter,tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(c44460150.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function c44460150.setfilter(c)
 	return c:IsCode(44460050) and not c:IsForbidden() 
@@ -67,7 +67,7 @@ function c44460150.stg(e,tp,eg,ep,ev,re,r,rp,chk)
 		and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 end
 end
 function c44460150.sop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
+
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 	local g=Duel.SelectMatchingCard(tp,c44460150.setfilter,tp,LOCATION_EXTRA,0,1,1,nil)
@@ -89,7 +89,7 @@ function c44460150.cfilter2(c)
 	return c:IsFaceup() and c:IsCode(44460050)
 end
 function c44460150.condition2(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c44460150.cfilter2,tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(c44460150.cfilter2,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function c44460150.setfilter2(c)
 	return c:IsCode(44460054) and not c:IsForbidden() 
@@ -99,7 +99,7 @@ function c44460150.stg2(e,tp,eg,ep,ev,re,r,rp,chk)
 		and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 end
 end
 function c44460150.sop2(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
+
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 	local g=Duel.SelectMatchingCard(tp,c44460150.setfilter2,tp,LOCATION_EXTRA,0,1,1,nil)

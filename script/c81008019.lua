@@ -1,90 +1,78 @@
---Answer·百濑莉绪·SIRIUS
+--练习曲只有1首·三船美优
 function c81008019.initial_effect(c)
-	--fusion material
-	c:EnableReviveLimit()
-	aux.AddFusionProcCodeFun(c,81008009,aux.FilterBoolFunction(Card.IsFusionType,TYPE_LINK),1,true,true)
-	--spsummon condition
+	--Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(c81008019.splimit)
+	e1:SetCategory(CATEGORY_DESTROY)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(TIMING_ATTACK,0x11e0)
+	e1:SetCost(c81008019.cost)
+	e1:SetTarget(c81008019.target)
+	e1:SetOperation(c81008019.activate)
 	c:RegisterEffect(e1)
-	--special summon rule
+	--spsummon
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_SPSUMMON_PROC)
-	e2:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-	e2:SetRange(LOCATION_EXTRA)
-	e2:SetCondition(c81008019.sprcon)
-	e2:SetOperation(c81008019.sprop)
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetCode(EVENT_CHAINING)
+	e2:SetRange(LOCATION_GRAVE)
+	e2:SetCondition(c81008019.spcon)
+	e2:SetTarget(c81008019.sptg)
+	e2:SetOperation(c81008019.spop)
 	c:RegisterEffect(e2)
-	--cannot be fusion material
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e3:SetCode(EFFECT_CANNOT_BE_FUSION_MATERIAL)
-	e3:SetValue(1)
-	c:RegisterEffect(e3)
-	--disable spsummon
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_FIELD)
-	e4:SetRange(LOCATION_MZONE)
-	e4:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e4:SetTargetRange(1,1)
-	e4:SetTarget(c81008019.slimit)
-	c:RegisterEffect(e4)
 end
-function c81008019.splimit(e,se,sp,st)
-	return e:GetHandler():GetLocation()~=LOCATION_EXTRA
+function c81008019.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.CheckLPCost(tp,1000) end
+	Duel.PayLPCost(tp,1000)
 end
-function c81008019.cfilter(c,tp)
-	return (c:IsFusionCode(81008009) or c:IsType(TYPE_LINK) and c:IsType(TYPE_MONSTER))
-		and c:IsCanBeFusionMaterial() and c:IsAbleToRemoveAsCost() and (c:IsControler(tp) or c:IsFaceup())
+function c81008019.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsOnField() and chkc~=e:GetHandler() end
+	if chk==0 then return Duel.IsExistingTarget(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler()) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	local g=Duel.SelectTarget(tp,aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,e:GetHandler())
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
-function c81008019.fcheck(c,sg)
-	return c:IsFusionCode(81008009) and sg:FilterCount(c81008019.fcheck2,c)+1==sg:GetCount()
-end
-function c81008019.fcheck2(c)
-	return c:IsType(TYPE_LINK) and c:IsType(TYPE_MONSTER)
-end
-function c81008019.fgoal(c,tp,sg)
-	return sg:GetCount()>1 and Duel.GetLocationCountFromEx(tp,tp,sg)>0 and sg:IsExists(c81008019.fcheck,1,nil,sg)
-end
-function c81008019.fselect(c,tp,mg,sg)
-	sg:AddCard(c)
-	local res=c81008019.fgoal(c,tp,sg) or mg:IsExists(c81008019.fselect,1,sg,tp,mg,sg)
-	sg:RemoveCard(c)
-	return res
-end
-function c81008019.sprcon(e,c)
-	if c==nil then return true end
-	local tp=c:GetControler()
-	local mg=Duel.GetMatchingGroup(c81008019.cfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil,tp)
-	local sg=Group.CreateGroup()
-	return mg:IsExists(c81008019.fselect,1,nil,tp,mg,sg)
-end
-function c81008019.sprop(e,tp,eg,ep,ev,re,r,rp,c)
-	local mg=Duel.GetMatchingGroup(c81008019.cfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil,tp)
-	local sg=Group.CreateGroup()
-	while true do
-		local cg=mg:Filter(c81008019.fselect,sg,tp,mg,sg)
-		if cg:GetCount()==0
-			or (c81008019.fgoal(c,tp,sg) and not Duel.SelectYesNo(tp,210)) then break end
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-		local g=cg:Select(tp,1,1,nil)
-		sg:Merge(g)
+function c81008019.activate(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) then
+		Duel.Destroy(tc,REASON_EFFECT)
 	end
-	Duel.Remove(sg,POS_FACEUP,REASON_COST)
-	--spsummon condition
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_SET_BASE_ATTACK)
-	e1:SetReset(RESET_EVENT+0xff0000)
-	e1:SetValue(sg:GetCount()*1000)
-	c:RegisterEffect(e1)
 end
-function c81008019.slimit(e,c,tp,sumtp,sumpos)
-	return bit.band(sumtp,SUMMON_TYPE_LINK)==SUMMON_TYPE_LINK
+function c81008019.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return re:IsActiveType(TYPE_MONSTER)
+end
+function c81008019.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return c:GetFlagEffect(81008019)==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,81008019,0,0x11,0,2500,5,RACE_FAIRY,ATTRIBUTE_WATER) end
+	c:RegisterFlagEffect(81008019,RESET_CHAIN,0,1)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
+end
+function c81008019.spop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) and Duel.IsPlayerCanSpecialSummonMonster(tp,81008019,0,0x11,0,2500,5,RACE_FAIRY,ATTRIBUTE_WATER) then
+		c:AddMonsterAttribute(TYPE_NORMAL)
+		Duel.SpecialSummonStep(c,0,tp,tp,true,false,POS_FACEUP)
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_IMMUNE_EFFECT)
+		e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)
+		e2:SetRange(LOCATION_MZONE)
+		e2:SetValue(c81008019.efilter)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+		c:RegisterEffect(e2,true)
+		local e3=Effect.CreateEffect(c)
+		e3:SetType(EFFECT_TYPE_SINGLE)
+		e3:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
+		e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e3:SetReset(RESET_EVENT+RESETS_REDIRECT)
+		e3:SetValue(LOCATION_REMOVED)
+		c:RegisterEffect(e3,true)
+		Duel.SpecialSummonComplete()
+	end
+end
+function c81008019.efilter(e,re)
+	return re:IsActiveType(TYPE_SPELL+TYPE_TRAP)
 end

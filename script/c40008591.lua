@@ -46,10 +46,10 @@ function c40008591.initial_effect(c)
 	c:RegisterEffect(e6)
 end
 function c40008591.eqlimit(e,c)
-	return c:IsSetCard(0xf016)
+	return c:IsSetCard(0xc016)
 end
 function c40008591.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0xf016)
+	return c:IsFaceup() and c:IsSetCard(0xc016)
 end
 function c40008591.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:GetLocation()==LOCATION_MZONE and c40008591.filter(chkc) end

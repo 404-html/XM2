@@ -1,64 +1,45 @@
---贴纸Collection
+--前往森罗灵峰之人 蓝子
 function c81019010.initial_effect(c)
-	c:SetUniqueOnField(1,0,81019010)
-	--Activate
+	--link summon
+	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsLinkRace,RACE_PLANT),2,2)
+	c:EnableReviveLimit()
+	--to deck
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetCountLimit(1,81019010)
+	e1:SetTarget(c81019010.sdtg)
+	e1:SetOperation(c81019010.sdop)
 	c:RegisterEffect(e1)
-	--draw
+	--deck check
 	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_DRAW)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e2:SetCode(EVENT_BATTLE_DESTROYING)
-	e2:SetCountLimit(1)
-	e2:SetRange(LOCATION_SZONE)
-	e2:SetCondition(c81019010.drcon)
-	e2:SetTarget(c81019010.drtg)
-	e2:SetOperation(c81019010.drop)
+	e2:SetCategory(CATEGORY_DECKDES)
+	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,81019910)
+	e2:SetTarget(c81019010.target)
+	e2:SetOperation(c81019010.operation)
 	c:RegisterEffect(e2)
-	--spsummon
-	local e3=Effect.CreateEffect(c)
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e3:SetType(EFFECT_TYPE_IGNITION)
-	e3:SetRange(LOCATION_GRAVE)
-	e3:SetCountLimit(1,81019010)
-	e3:SetCost(aux.bfgcost)
-	e3:SetTarget(c81019010.sptg)
-	e3:SetOperation(c81019010.spop)
-	c:RegisterEffect(e3)
 end
-function c81019010.drcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local rc=eg:GetFirst()
-	return rc:IsRelateToBattle() and rc:IsStatus(STATUS_OPPO_BATTLE)
-		and rc:IsFaceup() and rc:GetBaseAttack()==0 and rc:IsControler(tp)
+function c81019010.sdtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>2 end
 end
-function c81019010.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
-	Duel.SetTargetPlayer(tp)
-	Duel.SetTargetParam(1)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
+function c81019010.sdop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.SortDecktop(tp,tp,3)
 end
-function c81019010.drop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-	Duel.Draw(p,d,REASON_EFFECT)
+function c81019010.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,1) end
 end
-function c81019010.spfilter(c,e,tp)
-	return c:IsCode(81010015) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
-function c81019010.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(c81019010.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
-end
-function c81019010.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c81019010.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
-	if g:GetCount()>0 then
-		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+function c81019010.operation(e,tp,eg,ep,ev,re,r,rp)
+	if not Duel.IsPlayerCanDiscardDeck(tp,1) then return end
+	Duel.ConfirmDecktop(tp,1)
+	local g=Duel.GetDecktopGroup(tp,1)
+	local tc=g:GetFirst()
+	if tc:IsRace(RACE_PLANT) then
+		Duel.DisableShuffleCheck()
+		Duel.SendtoGrave(g,REASON_EFFECT+REASON_REVEAL)
+	else
+		Duel.MoveSequence(tc,1)
 	end
 end

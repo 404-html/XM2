@@ -1,148 +1,70 @@
---Answer·北沢志保
 function c81008003.initial_effect(c)
-	--xyz summon
-	aux.AddXyzProcedure(c,nil,4,3)
+	c:SetUniqueOnField(1,0,81008003)
+	--fusion material
 	c:EnableReviveLimit()
-	--pendulum summon
-	aux.EnablePendulumAttribute(c,false)
-	--atk up
+	aux.AddFusionProcFunRep(c,c81008003.ffilter,3,false)
+	--spsummon condition
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
-	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetRange(LOCATION_PZONE)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetCountLimit(1,81008003)
-	e1:SetCost(c81008003.atkcost)
-	e1:SetTarget(c81008003.atktg)
-	e1:SetOperation(c81008003.atkop)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e1:SetValue(aux.fuslimit)
 	c:RegisterEffect(e1)
-	--draw
+	--immune
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(81008003,0))
-	e2:SetCategory(CATEGORY_DRAW)
-	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e2:SetCode(EFFECT_IMMUNE_EFFECT)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1,81008903)
-	e2:SetCost(c81008003.drcost)
-	e2:SetTarget(c81008003.drtg)
-	e2:SetOperation(c81008003.drop)
+	e2:SetValue(c81008003.efilter)
 	c:RegisterEffect(e2)
+	--damage after destruction
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(81008003,1))
-	e3:SetType(EFFECT_TYPE_QUICK_O)
-	e3:SetCode(EVENT_FREE_CHAIN)
-	e3:SetHintTiming(0,TIMING_DRAW_PHASE)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetCountLimit(1,81008900)
-	e3:SetCost(c81008003.cost)
-	e3:SetOperation(c81008003.operation)
+	e3:SetCategory(CATEGORY_DAMAGE)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e3:SetCode(EVENT_LEAVE_FIELD)
+	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY+EFFECT_FLAG_PLAYER_TARGET)
+	e3:SetCountLimit(1,81008003)
+	e3:SetCondition(c81008003.damcon2)
+	e3:SetTarget(c81008003.damtg2)
+	e3:SetOperation(c81008003.damop2)
 	c:RegisterEffect(e3)
-	--pendulum
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e4:SetCode(EVENT_DESTROYED)
-	e4:SetProperty(EFFECT_FLAG_DELAY)
-	e4:SetCondition(c81008003.pencon)
-	e4:SetTarget(c81008003.pentg)
-	e4:SetOperation(c81008003.penop)
-	c:RegisterEffect(e4)
+	--cannot material
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e5:SetCode(EFFECT_CANNOT_BE_FUSION_MATERIAL)
+	e5:SetValue(1)
+	c:RegisterEffect(e5)
+	local e6=e5:Clone()
+	e6:SetCode(EFFECT_CANNOT_BE_SYNCHRO_MATERIAL)
+	c:RegisterEffect(e6)
+	local e7=e5:Clone()
+	e7:SetCode(EFFECT_CANNOT_BE_XYZ_MATERIAL)
+	c:RegisterEffect(e7)
+	local e8=e5:Clone()
+	e8:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL)
+	c:RegisterEffect(e8)
 end
-function c81008003.atkcfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsDiscardable()
+function c81008003.ffilter(c)
+	return c:IsLocation(LOCATION_MZONE) and c:GetSequence()<5 and not c:IsType(TYPE_TOKEN)
 end
-function c81008003.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c81008003.atkcfilter,tp,LOCATION_HAND,0,1,nil) end
-	Duel.DiscardHand(tp,c81008003.atkcfilter,1,1,REASON_COST+REASON_DISCARD)
+function c81008003.efilter(e,te)
+	return te:IsActiveType(TYPE_SPELL+TYPE_TRAP)
 end
-function c81008003.atkfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_MONSTER)
-end
-function c81008003.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c81008003.atkfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c81008003.atkfilter,tp,LOCATION_MZONE,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	Duel.SelectTarget(tp,c81008003.atkfilter,tp,LOCATION_MZONE,0,1,1,nil)
-end
-function c81008003.atkop(e,tp,eg,ep,ev,re,r,rp)
+function c81008003.damcon2(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetValue(1000)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		tc:RegisterEffect(e1)
-		local e2=e1:Clone()
-		e2:SetCode(EFFECT_UPDATE_DEFENSE)
-		tc:RegisterEffect(e2)
-	end
+	return (c:IsReason(REASON_BATTLE) or (c:GetReasonPlayer()==1-tp and c:IsReason(REASON_EFFECT)))
+		and c:IsPreviousPosition(POS_FACEUP)
 end
-function c81008003.costfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsDiscardable()
+function c81008003.damtg2(e,tp,eg,ep,ev,re,r,rp,chk)
+	local gc=Duel.GetMatchingGroupCount(nil,tp,LOCATION_GRAVE,0,nil)
+	if chk==0 then return gc>0 end
+	Duel.SetTargetPlayer(1-tp)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,gc*200)
 end
-function c81008003.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c81008003.costfilter,tp,LOCATION_HAND,0,1,nil) end
-	Duel.DiscardHand(tp,c81008003.costfilter,1,1,REASON_DISCARD+REASON_COST)
-end
-function c81008003.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
-	Duel.SetTargetPlayer(tp)
-	Duel.SetTargetParam(1)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
-end
-function c81008003.drop(e,tp,eg,ep,ev,re,r,rp)
-	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-	Duel.Draw(p,d,REASON_EFFECT)
-end
-function c81008003.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:CheckRemoveOverlayCard(tp,1,REASON_COST)
-		and Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil)
-		and c:GetFlagEffect(81008003)==0 end
-	c:RemoveOverlayCard(tp,1,1,REASON_COST)
-	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
-	c:RegisterFlagEffect(81008003,RESET_CHAIN,0,1)
-end
-function c81008003.operation(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetValue(1)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		c:RegisterEffect(e1)
-		local e2=e1:Clone()
-		e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-		c:RegisterEffect(e2)
-	end
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetCode(EFFECT_CHANGE_DAMAGE)
-	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e3:SetTargetRange(1,0)
-	e3:SetValue(0)
-	e3:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e3,tp)
-	local e4=e3:Clone()
-	e4:SetCode(EFFECT_NO_EFFECT_DAMAGE)
-	e4:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e4,tp)
-end
-function c81008003.pencon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsFaceup()
-end
-function c81008003.pentg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1) end
-end
-function c81008003.penop(e,tp,eg,ep,ev,re,r,rp)
-	if not Duel.CheckLocation(tp,LOCATION_PZONE,0) and not Duel.CheckLocation(tp,LOCATION_PZONE,1) then return false end
-	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
-		Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
-	end
+function c81008003.damop2(e,tp,eg,ep,ev,re,r,rp)
+	local gc=Duel.GetMatchingGroupCount(nil,tp,LOCATION_GRAVE,0,nil)
+	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
+	Duel.Damage(p,gc*200,REASON_EFFECT)
 end

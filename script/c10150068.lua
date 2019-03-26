@@ -12,7 +12,6 @@ function c10150068.initial_effect(c)
 	e1:SetOperation(c10150068.activate)
 	c:RegisterEffect(e1)	
 end
-
 function c10150068.cfilter(c)
 	return c:IsRace(RACE_DRAGON) and c:IsFaceup() and (c:IsLevelBelow(7) or c:IsRankAbove(7))
 end

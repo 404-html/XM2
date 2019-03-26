@@ -1,92 +1,93 @@
 --蛇毒绞蛇
 function c10150062.initial_effect(c)
-	--xyzlv
+	--special summon
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_XYZ_LEVEL)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetValue(c10150062.xyzlv)
-	c:RegisterEffect(e1)  
-	--spsummon
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+	e1:SetCode(EFFECT_SPSUMMON_PROC)
+	e1:SetRange(LOCATION_HAND)
+	e1:SetCountLimit(1,10150062)
+	e1:SetCondition(c10150062.sprcon)
+	e1:SetOperation(c10150062.sprop)
+	c:RegisterEffect(e1) 
+	--xyzlv
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(10150062,0))
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetRange(LOCATION_HAND)
-	e2:SetProperty(EFFECT_FLAG_DELAY)
-	e2:SetCode(EVENT_SUMMON_SUCCESS)
-	e2:SetCountLimit(1,10150062)
-	e2:SetCondition(c10150062.spcon)
-	e2:SetTarget(c10150062.sptg)
-	e2:SetOperation(c10150062.spop)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_XYZ_LEVEL)
+	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetValue(c10150062.xyzlv)
 	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	--effect gain
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e3:SetCode(EVENT_BE_MATERIAL)
+	e3:SetCondition(c10150062.efcon)
+	e3:SetOperation(c10150062.efop)
 	c:RegisterEffect(e3)
-	--to hand
-	local e4=Effect.CreateEffect(c)
-	e4:SetCategory(CATEGORY_TOHAND)
-	e4:SetType(EFFECT_TYPE_QUICK_O)
-	e4:SetCode(EVENT_FREE_CHAIN)
-	e4:SetCountLimit(1,10150162)
-	e4:SetRange(LOCATION_GRAVE)
-	e4:SetCost(c10150062.thcost)
-	e4:SetTarget(c10150062.thtg)
-	e4:SetOperation(c10150062.thop)
-	c:RegisterEffect(e4)
-	--xyzlimit
-	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_SINGLE)
-	e5:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
-	e5:SetCode(EFFECT_CANNOT_BE_XYZ_MATERIAL)
-	e5:SetValue(c10150062.xyzlimit)
-	c:RegisterEffect(e5)
 end
-function c10150062.xyzlimit(e,c)
-	if not c then return false end
-	return not c:IsRace(RACE_REPTILE)
+function c10150062.efcon(e,tp,eg,ep,ev,re,r,rp)
+	return bit.band(r,REASON_FUSION+REASON_SYNCHRO+REASON_XYZ+REASON_LINK)~=0
+		and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
-function c10150062.cfilter2(c)
-	return c:IsRace(RACE_REPTILE) and c:IsAbleToGraveAsCost()
+function c10150062.efop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local rc=c:GetReasonCard()
+	local e1=Effect.CreateEffect(rc)
+	e1:SetDescription(aux.Stringid(10150062,0))
+	e1:SetCategory(CATEGORY_TOGRAVE)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetTarget(c10150062.tg)
+	e1:SetOperation(c10150062.op)
+	e1:SetReset(RESET_EVENT+0x1fe0000)
+	rc:RegisterEffect(e1,true)
+	if not rc:IsType(TYPE_EFFECT) then
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_ADD_TYPE)
+		e2:SetValue(TYPE_EFFECT)
+		e2:SetReset(RESET_EVENT+0x1fe0000)
+		rc:RegisterEffect(e2,true)
+	end
 end
-function c10150062.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c10150062.cfilter2,tp,LOCATION_HAND+LOCATION_MZONE+LOCATION_DECK,0,1,nil) end
+function c10150062.tgfilter(c)
+	return c:IsRace(RACE_REPTILE) and c:IsAbleToGrave()
+end
+function c10150062.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c10150062.tgfilter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
+end
+function c10150062.op(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,c10150062.cfilter2,tp,LOCATION_HAND+LOCATION_MZONE+LOCATION_DECK,0,1,1,nil)
-	Duel.SendtoGrave(g,REASON_COST)
-end
-function c10150062.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToHand() end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,e:GetHandler(),1,0,0)
-end
-function c10150062.thop(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetHandler():IsRelateToEffect(e) then
-		Duel.SendtoHand(e:GetHandler(),nil,REASON_EFFECT)
+	local g=Duel.SelectMatchingCard(tp,c10150062.tgfilter,tp,LOCATION_DECK,0,1,2,nil)
+	if g:GetCount()>0 then
+	   Duel.SendtoGrave(g,REASON_EFFECT)
 	end
 end
 function c10150062.xyzlv(e,c,rc)
 	local lv=e:GetHandler():GetLevel()
-	if c:IsRace(RACE_REPTILE) then
-		return 4*65536+lv
+	if rc:IsRace(RACE_REPTILE) then
+		return 0x40000+lv
 	else return lv end
 end
-function c10150062.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x50)
+function c10150062.rfilter(c,tp)
+	return c:GetCounter(0x1009)>0 and Duel.GetMZoneCount(tp,c,tp)>0
 end
-function c10150062.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c10150062.cfilter,1,nil)
+function c10150062.sprcon(e,c)
+	if c==nil then return true end
+	local tp=c:GetControler()
+	local g1=Duel.GetMatchingGroup(Card.IsReleasable,tp,0,LOCATION_MZONE,nil)
+	local g2=Duel.GetReleaseGroup(tp)
+	g1:Merge(g2)
+	return g1:IsExists(c10150062.rfilter,1,nil,tp)
 end
-function c10150062.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,true,false) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
-end
-function c10150062.spop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
-	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
-		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) then
-		Duel.SendtoGrave(c,REASON_RULE)
-	end
+function c10150062.sprop(e,tp,eg,ep,ev,re,r,rp,c)
+	local g1=Duel.GetMatchingGroup(Card.IsReleasable,tp,0,LOCATION_MZONE,nil)
+	local g2=Duel.GetReleaseGroup(tp)
+	g1:Merge(g2)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
+	local rg=g1:FilterSelect(tp,c10150062.rfilter,1,1,nil,tp)
+	Duel.Release(rg,REASON_COST)
 end

@@ -1,90 +1,100 @@
---水本紫
+--雨过天晴·艾米莉
 function c81012009.initial_effect(c)
-	--special summon
+	c:SetSPSummonOnce(81012009)
+	--xyz summon
+	aux.AddXyzProcedure(c,nil,8,2,c81012009.ovfilter,aux.Stringid(81012009,0))
+	c:EnableReviveLimit()
+	--material
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_SPSUMMON_PROC)
-	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-	e1:SetRange(LOCATION_HAND)
-	e1:SetCondition(c81012009.spcon)
-	e1:SetOperation(c81012009.spop)
+	e1:SetDescription(aux.Stringid(81012009,1))
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,81012909)
+	e1:SetTarget(c81012009.mttg)
+	e1:SetOperation(c81012009.mtop)
 	c:RegisterEffect(e1)
-	--atkup
+	--destroy
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(81012009,2))
+	e2:SetCategory(CATEGORY_DESTROY)
+	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,81012009)
+	e2:SetCost(c81012009.descost)
+	e2:SetTarget(c81012009.destg)
+	e2:SetOperation(c81012009.desop)
+	c:RegisterEffect(e2)
+	--search
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetCode(EFFECT_UPDATE_ATTACK)
-	e3:SetCondition(c81012009.atkcon)
-	e3:SetValue(3000)
+	e3:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e3:SetCode(EVENT_TO_GRAVE)
+	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e3:SetCountLimit(1,81012099)
+	e3:SetCondition(c81012009.tscon)
+	e3:SetTarget(c81012009.tstg)
+	e3:SetOperation(c81012009.tsop)
 	c:RegisterEffect(e3)
-	--disable
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e4:SetCode(EVENT_ATTACK_ANNOUNCE)
-	e4:SetOperation(c81012009.disop)
-	c:RegisterEffect(e4)
-	local e5=e4:Clone()
-	e5:SetCode(EVENT_BE_BATTLE_TARGET)
-	c:RegisterEffect(e5)
 end
-function c81012009.rfilter(c,tp)
-	return c:IsAttack(0) and (c:IsControler(tp) or c:IsFaceup())
+function c81012009.mfilter(c)
+	return c:IsType(TYPE_RITUAL) and c:IsType(TYPE_PENDULUM)
 end
-function c81012009.mzfilter(c,tp)
-	return c:IsControler(tp) and c:GetSequence()<5
+function c81012009.ovfilter(c)
+	return c:IsFaceup() and c:IsCode(81012008)
 end
-function c81012009.spcon(e,c)
-	if c==nil then return true end
-	local tp=c:GetControler()
-	local rg=Duel.GetReleaseGroup(tp):Filter(c81012009.rfilter,nil,tp)
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	local ct=-ft+1
-	return ft>-2 and rg:GetCount()>1 and (ft>0 or rg:IsExists(c81012009.mzfilter,ct,nil,tp))
+function c81012009.mtfilter(c,e)
+	return (c:IsLocation(LOCATION_HAND) or c:IsFaceup()) and c:IsType(TYPE_RITUAL) and c:IsType(TYPE_PENDULUM) and not c:IsImmuneToEffect(e)
 end
-function c81012009.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local rg=Duel.GetReleaseGroup(tp):Filter(c81012009.rfilter,nil,tp)
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	local g=nil
-	if ft>0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-		g=rg:Select(tp,2,2,nil)
-	elseif ft==0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-		g=rg:FilterSelect(tp,c81012009.mzfilter,1,1,nil,tp)
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-		local g2=rg:Select(tp,1,1,g:GetFirst())
-		g:Merge(g2)
-	else
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-		g=rg:FilterSelect(tp,c81012009.mzfilter,2,2,nil,tp)
-	end
-	Duel.Release(g,REASON_COST)
+function c81012009.mttg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsType(TYPE_XYZ)
+		and Duel.IsExistingMatchingCard(c81012009.mtfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,nil,e) end
 end
-function c81012009.atkcon(e)
-	local ph=Duel.GetCurrentPhase()
-	local bc=e:GetHandler():GetBattleTarget()
-	return (ph==PHASE_DAMAGE or ph==PHASE_DAMAGE_CAL) and bc and bc:IsRace(RACE_ZOMBIE)
-end
-function c81012009.disop(e,tp,eg,ep,ev,re,r,rp)
+function c81012009.mtop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local bc=c:GetBattleTarget()
-	if bc and bc:IsRace(RACE_ZOMBIE) then
-		c:CreateRelation(bc,RESET_EVENT+RESETS_STANDARD)
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_DISABLE)
-		e1:SetCondition(c81012009.discon)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_BATTLE)
-		bc:RegisterEffect(e1)
-		local e2=Effect.CreateEffect(c)
-		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetCode(EFFECT_DISABLE_EFFECT)
-		e2:SetCondition(c81012009.discon)
-		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_BATTLE)
-		bc:RegisterEffect(e2)
+	if not c:IsRelateToEffect(e) or c:IsFacedown() then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
+	local g=Duel.SelectMatchingCard(tp,c81012009.mtfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,1,nil,e)
+	if g:GetCount()>0 then
+		Duel.Overlay(c,g)
 	end
 end
-function c81012009.discon(e)
-	return e:GetOwner():IsRelateToCard(e:GetHandler())
+function c81012009.descost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
+end
+function c81012009.cfilter(c)
+	return c:IsFaceup() and c:IsType(TYPE_PENDULUM) and c:IsType(TYPE_RITUAL)
+end
+function c81012009.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c81012009.cfilter,tp,LOCATION_MZONE,0,1,nil)
+		and Duel.IsExistingMatchingCard(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
+	local g=Duel.GetMatchingGroup(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
+end
+function c81012009.desop(e,tp,eg,ep,ev,re,r,rp)
+	local ct=Duel.GetMatchingGroupCount(c81012009.cfilter,tp,LOCATION_MZONE,0,nil)
+	if ct==0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	local g=Duel.SelectMatchingCard(tp,nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,ct,nil)
+	if g:GetCount()>0 then
+		Duel.Destroy(g,REASON_EFFECT)
+	end
+end
+function c81012009.tscon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
+end
+function c81012009.tsfilter(c)
+	return c:IsType(TYPE_RITUAL) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
+end
+function c81012009.tstg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c81012009.tsfilter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+end
+function c81012009.tsop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,c81012009.tsfilter,tp,LOCATION_DECK,0,1,1,nil)
+	if g:GetCount()>0 then
+		Duel.SendtoHand(g,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,g)
+	end
 end

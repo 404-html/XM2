@@ -26,7 +26,7 @@ function c40008586.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function c40008586.filter(c,e,tp)
-	return c:IsSetCard(0xf016) and c:IsRace(RACE_INSECT) and c:IsLevelAbove(5) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0xc016) and c:IsRace(RACE_INSECT) and c:IsLevelAbove(5) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c40008586.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
@@ -42,7 +42,7 @@ function c40008586.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c40008586.cfilter(c)
-	return c:IsSetCard(0xf016) and c:IsAbleToRemoveAsCost() and not c:IsCode(40008586)
+	return c:IsSetCard(0xc016) and c:IsAbleToRemoveAsCost() and not c:IsCode(40008586)
 end
 function c40008586.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost()
@@ -56,7 +56,7 @@ function c40008586.thfilter1(c,e,tp)
 	return c:IsCanBeSpecialSummoned(e,0,1-tp,false,false)
 end
 function c40008586.tgfilter(c)
-	return c:IsSetCard(0xf016) and c:IsAbleToGrave()
+	return c:IsSetCard(0xc016) and c:IsAbleToGrave()
 end
 function c40008586.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0

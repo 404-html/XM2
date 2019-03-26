@@ -26,7 +26,7 @@ function c40008584.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function c40008584.filter(c,e,tp)
-	return c:IsSetCard(0xf016) and c:IsRace(RACE_ZOMBIE) and c:IsLevelAbove(5) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0xc016) and c:IsRace(RACE_ZOMBIE) and c:IsLevelAbove(5) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c40008584.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
@@ -42,7 +42,7 @@ function c40008584.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c40008584.cfilter(c)
-	return c:IsSetCard(0xf016) and c:IsAbleToRemoveAsCost() and not c:IsCode(40008584)
+	return c:IsSetCard(0xc016) and c:IsAbleToRemoveAsCost() and not c:IsCode(40008584)
 end
 function c40008584.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost()
@@ -53,7 +53,7 @@ function c40008584.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function c40008584.thfilter(c)
-	return c:IsSetCard(0xf016) and c:IsAbleToHand()
+	return c:IsSetCard(0xc016) and c:IsAbleToHand()
 end
 function c40008584.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c40008584.thfilter,tp,LOCATION_DECK,0,1,nil) end

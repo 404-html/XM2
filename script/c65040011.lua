@@ -57,21 +57,24 @@ function c65040011.spop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
+function c65040011.tgfil(c)
+	return c:IsAbleToHand() and c:IsAttackAbove(0) and c:IsDefenseAbove(0)
+end
 function c65040011.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsAbleToHand() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToHand,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	if chk==0 then return Duel.IsExistingTarget(c65040011.tgfil,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=Duel.SelectTarget(tp,Card.IsAbleToHand,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
-	local rec=g:GetFirst():GetDefense()
-	local dam=g:GetFirst():GetAttack()
+	local g=Duel.SelectTarget(tp,c65040011.tgfil,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+	local rec=g:GetFirst():GetBaseDefense()
+	local dam=g:GetFirst():GetBaseAttack()
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,0,0,tp,rec)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,0,0,1-tp,dam)
 end
 function c65040011.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	local rec=tc:GetDefense()
-	local dam=tc:GetAttack()
+	local rec=tc:GetBaseDefense()
+	local dam=tc:GetBaseAttack()
 	if tc and tc:IsRelateToEffect(e) then
 		if Duel.SendtoHand(tc,nil,REASON_EFFECT)~=0 then
 			Duel.BreakEffect()

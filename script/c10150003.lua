@@ -2,61 +2,71 @@
 function c10150003.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_DAMAGE)
+	e1:SetDescription(aux.Stringid(10150003,0))
+	e1:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND+CATEGORY_TOGRAVE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetCountLimit(1,10150003+EFFECT_COUNT_CODE_OATH)
 	e1:SetTarget(c10150003.target)
 	e1:SetOperation(c10150003.activate)
-	c:RegisterEffect(e1)
-	--xyzma
+	c:RegisterEffect(e1) 
+	--sp
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(10150003,0))
-	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetDescription(aux.Stringid(10150003,1))
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_GRAVE)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetCountLimit(1,10150003)
-	e2:SetTarget(c10150003.xyztg)
-	e2:SetOperation(c10150003.xyzop)
+	e2:SetCost(aux.bfgcost)
+	e2:SetCondition(aux.exccon)
+	e2:SetTarget(c10150003.sptg)
+	e2:SetOperation(c10150003.spop)
 	c:RegisterEffect(e2)   
 end
-
-function c10150003.xyztg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local c=e:GetHandler()
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c10150003.xyzfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c10150003.xyzfilter,tp,LOCATION_MZONE,0,1,nil)  end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,c10150003.xyzfilter,tp,LOCATION_MZONE,0,1,1,nil)
+function c10150003.spfilter(c,e,tp)
+	return c:IsCode(74677422) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-
-function c10150003.xyzop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local tc=Duel.GetFirstTarget()
-	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) then
-		local og=tc:GetOverlayGroup()
-		Duel.Overlay(tc,Group.FromCards(c))
+function c10150003.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(c10150003.spfilter,tp,0x13,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,0x13)
+end
+function c10150003.spop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c10150003.spfilter),tp,0x13,0,1,1,nil,e,tp)
+	if g:GetCount()>0 then
+	   Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-
-function c10150003.xyzfilter(c)
-	return c:IsRace(RACE_DRAGON) and c:IsFaceup() and c:IsType(TYPE_XYZ)
+function c10150003.thfilter(c)
+	return c:IsSetCard(0x3b) and c:IsAbleToHand() and c:IsType(TYPE_MONSTER)
 end
-
-function c10150003.filter(c)
-	return c:IsRace(RACE_DRAGON) and c:IsFaceup()
+function c10150003.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then
+		local g=Duel.GetMatchingGroup(c10150003.thfilter,tp,LOCATION_DECK,0,nil)
+		return g:GetClassCount(Card.GetCode)>=3
+	end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,0,LOCATION_DECK)
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,2,0,LOCATION_DECK)
 end
-
-function c10150003.target(e,tp,eg,ep,ev,re,r,rp,chk) 
-	local gc=Duel.GetMatchingGroupCount(c10150003.filter,tp,LOCATION_MZONE,0,nil)
-	if chk==0 then return gc>0 end
-	Duel.SetTargetPlayer(1-tp)
-	Duel.SetTargetParam(gc*500)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,gc*500)
-end
-
 function c10150003.activate(e,tp,eg,ep,ev,re,r,rp)
-	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
-	local gc=Duel.GetMatchingGroupCount(c10150003.filter,tp,LOCATION_MZONE,0,nil)
-	Duel.Damage(p,gc*500,REASON_EFFECT)
+	local g=Duel.GetMatchingGroup(c10150003.thfilter,tp,LOCATION_DECK,0,nil)
+	if g:GetClassCount(Card.GetCode)>=3 then
+		local cg=Group.CreateGroup()
+		for i=1,3 do
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+			local sg=g:Select(tp,1,1,nil)
+			g:Remove(Card.IsCode,nil,sg:GetFirst():GetCode())
+			cg:Merge(sg)
+		end
+		Duel.ShuffleDeck(tp)
+		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_SPSUMMON)
+		local tg=cg:Select(1-tp,1,1,nil)
+		local tc=tg:GetFirst()
+		if tc:IsAbleToHand() and Duel.SendtoHand(tc,nil,REASON_EFFECT)~=0 then
+		   Duel.ConfirmCards(1-tp,tc)  
+		   cg:RemoveCard(tc)
+		end
+		Duel.SendtoGrave(cg,REASON_EFFECT)
+	end
 end

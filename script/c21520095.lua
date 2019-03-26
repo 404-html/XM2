@@ -12,9 +12,9 @@ function c21520095.initial_effect(c)
 end
 function c21520095.filter(c,e,tp,tc)
 	if not tc then
-		return c:IsCanBeSpecialSummoned(e,0,tp,false,false) or c:IsAbleToHand()
+		return c:IsType(TYPE_MONSTER) and (c:IsCanBeSpecialSummoned(e,0,tp,false,false) or c:IsAbleToHand())
 	else
-		return c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:GetTextAttack()==tc:GetTextAttack() and c:GetTextDefense()==tc:GetTextDefense()
+		return c:IsType(TYPE_MONSTER) and (c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:GetTextAttack()==tc:GetTextAttack() and c:GetTextDefense()==tc:GetTextDefense())
 	end
 end
 function c21520095.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

@@ -30,6 +30,7 @@ end
 function c44460100.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c44460100.filter,tp,LOCATION_GRAVE,0,1,nil)
 		and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 end
+	e:GetHandler():SetTurnCounter(0)
 	--destroy
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)

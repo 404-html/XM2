@@ -1,36 +1,26 @@
---姬川友纪
+--战术袭胸
 function c81010026.initial_effect(c)
-    --pendulum summon
-    aux.EnablePendulumAttribute(c)
-    --level
-    local e2=Effect.CreateEffect(c)
-    e2:SetType(EFFECT_TYPE_IGNITION)
-    e2:SetRange(LOCATION_PZONE)
-    e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-    e2:SetCountLimit(1)
-    e2:SetTarget(c81010026.lvtg)
-    e2:SetOperation(c81010026.lvop)
-    c:RegisterEffect(e2)
+	--Activate
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCategory(CATEGORY_DAMAGE)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCondition(c81010026.condition)
+	e1:SetTarget(c81010026.damtg)
+	e1:SetOperation(c81010026.damop)
+	c:RegisterEffect(e1)
 end
-function c81010026.filter(c)
-    return c:IsFaceup()
+function c81010026.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetCurrentChain()>3 and Duel.CheckChainUniqueness()
 end
-function c81010026.lvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-    if chkc then return chkc:IsLocation(LOCATION_MZONE) and c81010026.filter(chkc) end
-    if chk==0 then return Duel.IsExistingTarget(c81010026.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
-    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-    Duel.SelectTarget(tp,c81010026.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+function c81010026.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetTargetPlayer(1-tp)
+	Duel.SetTargetParam(2000)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,2000)
 end
-function c81010026.lvop(e,tp,eg,ep,ev,re,r,rp)
-    if not e:GetHandler():IsRelateToEffect(e) then return end
-    local tc=Duel.GetFirstTarget()
-    if tc:IsRelateToEffect(e) and tc:IsFaceup() then
-        local e1=Effect.CreateEffect(e:GetHandler())
-        e1:SetType(EFFECT_TYPE_SINGLE)
-        e1:SetCode(EFFECT_UPDATE_ATTACK)
-        e1:SetValue(100)
-        e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-        tc:RegisterEffect(e1)
-    end
-
+function c81010026.damop(e,tp,eg,ep,ev,re,r,rp)
+	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+	Duel.Damage(p,d,REASON_EFFECT)
 end

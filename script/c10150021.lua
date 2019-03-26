@@ -49,49 +49,45 @@ function c10150021.initial_effect(c)
 	e6:SetOperation(c10150021.spop)
 	c:RegisterEffect(e6)
 end
-
 function c10150021.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsReason(REASON_LOST_TARGET) and e:GetHandler():GetPreviousEquipTarget():IsReason(REASON_DESTROY)
+	local ec=e:GetHandler():GetPreviousEquipTarget()
+	return e:GetHandler():IsReason(REASON_LOST_TARGET) and ec and ec:IsLocation(LOCATION_GRAVE)
 end
-
 function c10150021.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	local ec=c:GetPreviousEquipTarget()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and ec:IsCanBeSpecialSummoned(e,0,tp,false,false) and ec:IsType(TYPE_XYZ) end
+	Duel.SetTargetCard(ec)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,ec,1,0,0)
 end
-
 function c10150021.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local ec=c:GetPreviousEquipTarget()
-	if c:IsRelateToEffect(e) and Duel.SpecialSummon(ec,0,tp,tp,false,false,POS_FACEUP)~=0 and ec:IsType(TYPE_XYZ) then
+	if ec:IsRelateToEffect(e) and Duel.SpecialSummon(ec,0,tp,tp,false,false,POS_FACEUP)~=0 and ec:IsType(TYPE_XYZ) and c:IsRelateToEffect(e) then
 	   Duel.Overlay(ec,Group.FromCards(c))
 	end
 end
-
 function c10150021.rcon(e,tp,eg,ep,ev,re,r,rp)
-	local ec=e:GetHandler():GetEquipTarget()
-	return bit.band(r,REASON_COST)~=0 and Duel.CheckLPCost(tp,800) and re:IsHasType(0x7e0) and re:IsActiveType(TYPE_XYZ)
-		and re:GetHandler():GetOverlayCount()>=ev-1 and ec and re:GetHandler()==ec 
+	return bit.band(r,REASON_COST)~=0 and re:GetHandler():IsType(TYPE_XYZ)
+		and ep==e:GetOwnerPlayer() and e:GetHandler():GetEquipTarget()==re:GetHandler() and re:GetHandler():GetOverlayCount()>=ev-1 and e:GetHandler():GetFlagEffect(10150021)<=0
 end
-
 function c10150021.rop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=bit.band(ev,0xffff)
 	Duel.PayLPCost(tp,800)
 	if ct>1 then
-		re:GetHandler():RemoveOverlayCard(tp,ct-1,ct-1,REASON_COST)
+	   re:GetHandler():RemoveOverlayCard(tp,ct-1,ct-1,REASON_COST)
 	end
+	e:GetHandler():RegisterFlagEffect(10150021,RESET_PHASE+PHASE_END,0,1)
 end
-
 function c10150021.indval(e,re,tp)
 	return tp~=e:GetHandlerPlayer()
 end
 function c10150021.eqlimit(e,c)
-	return c:IsRace(RACE_DRAGON) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsType(TYPE_XYZ) and c:GetControler()==e:GetHandler():GetControler() 
+	return c:IsType(TYPE_XYZ) and c:IsRankAbove(5)
 end
 function c10150021.filter(c)
-	return c:IsFaceup() and c:IsRace(RACE_DRAGON) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsType(TYPE_XYZ)
+	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:IsRankAbove(5)
 end
 function c10150021.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c10150021.filter(chkc) end

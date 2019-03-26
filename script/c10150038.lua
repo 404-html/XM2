@@ -16,7 +16,6 @@ function c10150038.initial_effect(c)
 	--choose effect
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(10150038,4))
-	e2:SetCategory(CATEGORY_DESTROY+CATEGORY_ATKCHANGE)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCost(c10150038.cecost)
@@ -24,25 +23,21 @@ function c10150038.initial_effect(c)
 	e2:SetOperation(c10150038.ceop)
 	c:RegisterEffect(e2)  
 end
-
 function c10150038.cecost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
-
 function c10150038.filter1(c)
 	return c:IsAbleToGrave() and c:IsRace(RACE_REPTILE)
 end
-
 function c10150038.filter2(c)
-	return c:IsAbleToHand() and c:IsRace(RACE_REPTILE)
+	return c:IsAbleToHand() and c:IsSetCard(0x50)
 end
-
 function c10150038.cetg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local b1=Duel.IsExistingMatchingCard(c10150038.filter1,tp,LOCATION_DECK,0,1,nil)
-	local b2=Duel.IsExistingMatchingCard(Card.IsDestructable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
+	local b2=Duel.IsExistingMatchingCard(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
 	local b3=Duel.IsExistingMatchingCard(c10150038.filter2,tp,LOCATION_DECK,0,1,nil)
-	local count=Duel.GetCounter(tp,LOCATION_ONFIELD,LOCATION_ONFIELD,0x1009)
+	local count=Duel.GetCounter(tp,1,1,0x1009)
 	if chk==0 then return (b1 or b2 or b3) and count>0 end
 	local ops={}
 	local opval={}
@@ -66,14 +61,16 @@ function c10150038.cetg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local sel=opval[op]
 	e:SetLabel(sel)
 	if sel==1 then
+		e:SetCategory(CATEGORY_TOGRAVE)
 		Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 	elseif sel==2 then
+		e:SetCategory(CATEGORY_DESTROY)
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,0,0)
 	elseif sel==3 then
+		e:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
 		Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 	end
 end
-
 function c10150038.ceop(e,tp,eg,ep,ev,re,r,rp)
 	local sel=e:GetLabel()
 	if sel==1 then
@@ -86,6 +83,7 @@ function c10150038.ceop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		local g=Duel.SelectMatchingCard(tp,Card.IsDestructable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 		if g:GetCount()>0 then
+			Duel.HintSelection(g)
 			Duel.Destroy(g,REASON_EFFECT)
 		end 
 	elseif sel==3 then
@@ -97,21 +95,17 @@ function c10150038.ceop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end 
-
 function c10150038.con(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetSummonType()==SUMMON_TYPE_XYZ 
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_XYZ)
 end
-
 function c10150038.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local g=Duel.GetMatchingGroup(c10150038.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	Duel.SetOperationInfo(0,CATEGORY_COUNTER,nil,g:GetCount(),0,0)
 end
-
 function c10150038.filter(c)
-	return c:IsCanAddCounter(0x1009,1) and c:IsFaceup() --and not c:IsSetCard(0x50)
+	return c:IsCanAddCounter(0x1009,1) and c:IsFaceup() 
 end
-
 function c10150038.op(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c10150038.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	local tc=g:GetFirst()

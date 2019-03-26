@@ -1,73 +1,88 @@
---川岛瑞树
+--七大爱好 撸猫
 function c81010023.initial_effect(c)
-    c:EnableReviveLimit()
-    aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsLinkRace,RACE_SPELLCASTER),2)
-    c:EnableCounterPermit(0x1)
-    --add counter
-    local e2=Effect.CreateEffect(c)
-    e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
-    e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-    e2:SetCode(EVENT_CHAINING)
-    e2:SetRange(LOCATION_MZONE)
-    e2:SetOperation(aux.chainreg)
-    c:RegisterEffect(e2)
-    local e3=Effect.CreateEffect(c)
-    e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
-    e3:SetCode(EVENT_CHAIN_SOLVING)
-    e3:SetProperty(EFFECT_FLAG_DELAY)
-    e3:SetRange(LOCATION_MZONE)
-    e3:SetOperation(c81010023.acop)
-    c:RegisterEffect(e3)
-    --to hand
-    local e4=Effect.CreateEffect(c)
-    e4:SetDescription(aux.Stringid(81010023,1))
-    e4:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
-    e4:SetType(EFFECT_TYPE_QUICK_O)
-    e4:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
-    e4:SetCode(EVENT_FREE_CHAIN)
-    e4:SetRange(LOCATION_MZONE)
-    e4:SetCountLimit(1,81010023)
-    e4:SetHintTiming(TIMING_DAMAGE_STEP)
-    e4:SetCondition(c81010023.atkcon)
-    e4:SetCost(c81010023.atkcost)
-    e4:SetTarget(c81010023.atktg)
-    e4:SetOperation(c81010023.atkop)
-    c:RegisterEffect(e4)
+	--Activate
+	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_EQUIP)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetTarget(c81010023.target)
+	e1:SetOperation(c81010023.operation)
+	c:RegisterEffect(e1)
+	--Atk,race
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_EQUIP)
+	e2:SetCode(EFFECT_CHANGE_RACE)
+	e2:SetValue(RACE_BEAST)
+	c:RegisterEffect(e2)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_EQUIP)
+	e3:SetCode(EFFECT_UPDATE_ATTACK)
+	e3:SetValue(1000)
+	c:RegisterEffect(e3)
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_EQUIP)
+	e4:SetCode(EFFECT_UPDATE_DEFENSE)
+	e4:SetValue(1000)
+	c:RegisterEffect(e4)
+	--Equip limit
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetCode(EFFECT_EQUIP_LIMIT)
+	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e4:SetValue(1)
+	c:RegisterEffect(e4)
+	--leave
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e5:SetCode(EVENT_LEAVE_FIELD)
+	e5:SetCondition(c81010023.atkcon)
+	e5:SetOperation(c81010023.atkop)
+	c:RegisterEffect(e5)
 end
-function c81010023.acop(e,tp,eg,ep,ev,re,r,rp)
-    if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) and e:GetHandler():GetFlagEffect(1)>0 then
-        e:GetHandler():AddCounter(0x1,1)
-    end
+function c81010023.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
+	Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
+end
+function c81010023.operation(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if e:GetHandler():IsRelateToEffect(e) and tc:IsRelateToEffect(e) and tc:IsFaceup() then
+		Duel.Equip(tp,e:GetHandler(),tc)
+	end
 end
 function c81010023.atkcon(e,tp,eg,ep,ev,re,r,rp)
-    return Duel.GetCurrentPhase()>=PHASE_BATTLE_START and Duel.GetCurrentPhase()<=PHASE_BATTLE
-        and (Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated())
-end
-function c81010023.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
-    local c=e:GetHandler()
-    if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,0x1,6,REASON_COST) end
-    Duel.RemoveCounter(tp,1,0,0x1,6,REASON_COST)
-end
-function c81010023.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-    if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
-    if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
-    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-    Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+	local c=e:GetHandler()
+	local tc=c:GetFirstCardTarget()
+	if tc and tc:IsLocation(LOCATION_MZONE) and tc:IsFaceup() then
+		e:SetLabelObject(tc)
+		tc:CreateEffectRelation(e)
+		return true
+	else return false end
 end
 function c81010023.atkop(e,tp,eg,ep,ev,re,r,rp)
-    local tc=Duel.GetFirstTarget()
-    if tc:IsRelateToEffect(e) and tc:IsFaceup() then
-        local e1=Effect.CreateEffect(e:GetHandler())
-        e1:SetType(EFFECT_TYPE_SINGLE)
-        e1:SetCode(EFFECT_SET_ATTACK_FINAL)
-        e1:SetValue(0)
-        e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-        tc:RegisterEffect(e1)
-        local e2=Effect.CreateEffect(e:GetHandler())
-        e2:SetType(EFFECT_TYPE_SINGLE)
-        e2:SetCode(EFFECT_SET_DEFENSE_FINAL)
-        e2:SetValue(0)
-        e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-        tc:RegisterEffect(e2)
-    end
+	local c=e:GetHandler()
+	local tc=e:GetLabelObject()
+	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_CHANGE_LEVEL)
+		e1:SetValue(5)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		tc:RegisterEffect(e1)
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_SET_ATTACK_FINAL)
+		e2:SetValue(1350)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+		tc:RegisterEffect(e2)
+		local e3=Effect.CreateEffect(c)
+		e3:SetType(EFFECT_TYPE_SINGLE)
+		e3:SetCode(EFFECT_SET_DEFENSE_FINAL)
+		e3:SetValue(1600)
+		e3:SetReset(RESET_EVENT+RESETS_STANDARD)
+		tc:RegisterEffect(e3)
+	end
 end

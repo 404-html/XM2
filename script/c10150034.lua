@@ -2,7 +2,7 @@
 function c10150034.initial_effect(c)
 	--Negate
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
+	e1:SetCategory(CATEGORY_DISABLE+CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_CHAINING)
 	e1:SetCondition(c10150034.condition)
@@ -16,12 +16,12 @@ function c10150034.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.PayLPCost(tp,1500)
 end
 function c10150034.condition(e,tp,eg,ep,ev,re,r,rp)
-	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
+	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) or rp==tp then return false end
 	local tg=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	return tg and tg:IsExists(c10150034.tgfilter,1,nil,tp) and Duel.IsChainDisablable(ev)
 end
 function c10150034.tgfilter(c,tp)
-	return c:IsLocation(LOCATION_MZONE) and c:IsControler(tp)
+	return c:IsControler(tp)
 end
 function c10150034.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateEffect(ev)

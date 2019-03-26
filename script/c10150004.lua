@@ -50,13 +50,20 @@ function c10150004.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local op=e:GetLabel()
 	local tc=nil
-	 Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	 if op==0 then
-		tc=Duel.SelectMatchingCard(tp,c10150004.filter2,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,e,tp):GetFirst()
-	 else
-		tc=Duel.SelectMatchingCard(tp,c10150004.filter3,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,e,tp):GetFirst()
-	 end
-	  if tc then
-		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
-	  end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	if op==0 then
+	   tc=Duel.SelectMatchingCard(tp,c10150004.filter2,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,e,tp):GetFirst()
+	else
+	   tc=Duel.SelectMatchingCard(tp,c10150004.filter3,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,e,tp):GetFirst()
+	end
+	if tc and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)~=0 then
+	   local e1=Effect.CreateEffect(c)
+	   e1:SetType(EFFECT_TYPE_SINGLE)
+	   e1:SetCode(EFFECT_DISABLE)
+	   e1:SetReset(RESET_EVENT+0x1fe0000)
+	   tc:RegisterEffect(e1)
+	   local e2=e1:Clone()
+	   e2:SetCode(EFFECT_DISABLE_EFFECT)
+	   tc:RegisterEffect(e2)
+	end
 end

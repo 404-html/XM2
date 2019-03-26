@@ -16,6 +16,7 @@ function c65010114.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e2:SetRange(LOCATION_MZONE)
 	e2:SetCondition(c65010114.con)
 	e2:SetTargetRange(1,0)
 	c:RegisterEffect(e2)
@@ -54,11 +55,14 @@ function c65010114.hspval(e,c)
 	return 0,zone
 end
 function c65010114.confil(c,tp)
-	return not c:GetOwner()==tp
+	return c:GetOwner()~=tp
+end
+function c65010114.confil2(c)
+	return c:IsSetCard(0x5da0) and c:IsFaceup()
 end
 function c65010114.con(e,c)
-	local tp=e:GetControler()
-	return Duel.IsExistingMatchingCard(Card.IsSetCard,tp,0,LOCATION_MZONE,1,nil,0x5da0) and Duel.IsExistingMatchingCard(c65010114.confil,tp,LOCATION_MZONE,0,1,nil,tp)
+	local tp=e:GetHandlerPlayer()
+	return Duel.IsExistingMatchingCard(c65010114.confil2,tp,0,LOCATION_MZONE,1,nil) and Duel.IsExistingMatchingCard(c65010114.confil,tp,LOCATION_MZONE,0,1,nil,tp)
 end
 function c65010114.cocon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp

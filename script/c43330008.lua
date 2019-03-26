@@ -61,10 +61,13 @@ function cm.desfilter(c,tp)
 end
 function cm.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectMatchingCard(tp,cm.desfilter,tp,LOCATION_ONFIELD,0,1,1,c)
-	if g:GetCount()>0 and Duel.Destroy(g,REASON_EFFECT)~=0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsRelateToEffect(e) then
-	   Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
+	   Duel.BreakEffect()
+	   Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	   local g=Duel.SelectMatchingCard(tp,cm.desfilter,tp,LOCATION_ONFIELD,0,1,1,c)
+	   if g:GetCount()>0 then
+		  Duel.Destroy(g,REASON_EFFECT)
+	   end  
 	end
 end
 function cm.thfilter(c)
@@ -85,7 +88,7 @@ function cm.thop(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()>0 and Duel.SendtoHand(g,nil,REASON_EFFECT)~=0 and Duel.IsExistingMatchingCard(aux.NecroValleyFilter(cm.thfilter2),tp,0,LOCATION_GRAVE,1,nil) then
 	   Duel.BreakEffect()
 	   Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_ATOHAND)
-	   local tg=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(cm.thfilter2),tp,0,LOCATION_GRAVE,1,1,nil)
+	   local tg=Duel.SelectMatchingCard(1-tp,aux.NecroValleyFilter(cm.thfilter2),tp,0,LOCATION_GRAVE,1,1,nil)
 	   Duel.SendtoHand(tg,nil,REASON_EFFECT)
 	end
 end

@@ -24,6 +24,7 @@ function c44460155.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetTargetPlayer(tp)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,tp,LOCATION_GRAVE)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
+	e:GetHandler():SetTurnCounter(0)
 	--destroy
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -52,7 +53,7 @@ function c44460155.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c44460155.descon(e,tp,eg,ep,ev,re,r,rp)
-	return tp~=Duel.GetTurnPlayer()
+	return tp==Duel.GetTurnPlayer()
 end
 function c44460155.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

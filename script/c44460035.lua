@@ -74,7 +74,7 @@ function c44460035.cfilter(c)
 end
 function c44460035.con(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()==PHASE_MAIN1
-	and not Duel.IsExistingMatchingCard(c44460035.cfilter,tp,0,LOCATION_ONFIELD,1,nil)
+	and not Duel.IsExistingMatchingCard(c44460035.cfilter,e:GetHandlerPlayer(),0,LOCATION_ONFIELD,1,nil)
 end
 function c44460035.aclimit(e,re,tp)
 	return re:IsActiveType(TYPE_MONSTER) and not re:GetHandler():IsImmuneToEffect(e)

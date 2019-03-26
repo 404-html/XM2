@@ -35,7 +35,8 @@ function c65080005.ovfilter(c)
 	return c:IsFaceup() and c:IsRankAbove(4) and c:IsAttribute(ATTRIBUTE_WATER)
 end
 function c65080005.xyzop(e,tp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,65080005)==0 end
+	if chk==0 then return Duel.GetFlagEffect(tp,65080005)==0 and Duel.GetCounter(tp,LOCATION_ONFIELD,LOCATION_ONFIELD,0x1015)>0 end
+	Duel.RemoveCounter(tp,LOCATION_ONFIELD,LOCATION_ONFIELD,0x1015,1,REASON_COST)
 	Duel.RegisterFlagEffect(tp,65080005,RESET_PHASE+PHASE_END,0,1)
 end
 function c65080005.ctcon(e,tp,eg,ep,ev,re,r,rp)

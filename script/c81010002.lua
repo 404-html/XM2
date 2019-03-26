@@ -1,49 +1,46 @@
---渋谷凛
+--A-chasing-Y
 function c81010002.initial_effect(c)
-    c:EnableReviveLimit()
-    --code
-    local e1=Effect.CreateEffect(c)
-    e1:SetType(EFFECT_TYPE_SINGLE)
-    e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-    e1:SetCode(EFFECT_CHANGE_CODE)
-    e1:SetRange(LOCATION_MZONE+LOCATION_HAND)
-    e1:SetValue(81010019)
-    c:RegisterEffect(e1)
-    --indes
-    local e2=Effect.CreateEffect(c)
-    e2:SetType(EFFECT_TYPE_FIELD)
-    e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-    e2:SetRange(LOCATION_MZONE)
-    e2:SetTargetRange(LOCATION_MZONE,0)
-    e2:SetCondition(c81010002.indcon)
-    e2:SetTarget(c81010002.indtg)
-    e2:SetValue(1)
-    c:RegisterEffect(e2)
-    --chain attack
-    local e3=Effect.CreateEffect(c)
-    e3:SetDescription(aux.Stringid(81010002,0))
-    e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-    e3:SetCode(EVENT_BATTLE_DESTROYING)
-    e3:SetCountLimit(1,81010002)
-    e3:SetCondition(c81010002.atcon)
-    e3:SetOperation(c81010002.atop)
-    c:RegisterEffect(e3)
+	e1=aux.AddRitualProcGreater2(c,c81010002.filter,LOCATION_HAND,c81010002.mfilter)
+	e1:SetCountLimit(1,81010002+EFFECT_COUNT_CODE_OATH)
+	--to hand
+	local e2=Effect.CreateEffect(c)
+	e2:SetCategory(CATEGORY_TOHAND)
+	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetRange(LOCATION_GRAVE)
+	e2:SetCountLimit(1,81010092)
+	e2:SetCondition(aux.exccon)
+	e2:SetCost(aux.bfgcost)
+	e2:SetOperation(c81010002.regop)
+	c:RegisterEffect(e2)
 end
-function c81010002.indcon(e,tp,eg,ep,ev,re,r,rp)
-    return e:GetHandler():IsSummonType(SUMMON_TYPE_RITUAL)
-end
-function c81010002.indtg(e,c)
-    return c:IsType(TYPE_RITUAL)
+function c81010002.filter(c)
+	return c:IsType(TYPE_PENDULUM)
 end
 function c81010002.mfilter(c)
-    return not c:IsType(TYPE_RITUAL)
+	return c:IsType(TYPE_PENDULUM) and c:IsType(TYPE_RITUAL)
 end
-function c81010002.atcon(e,tp,eg,ep,ev,re,r,rp)
-    local c=e:GetHandler()
-    local bc=c:GetBattleTarget()
-    return bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER) and c:IsChainAttackable() and c:IsStatus(STATUS_OPPO_BATTLE)
+function c81010002.regop(e,tp,eg,ep,ev,re,r,rp)
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_PHASE+PHASE_END)
+	e1:SetCountLimit(1)
+	e1:SetCondition(c81010002.thcon)
+	e1:SetOperation(c81010002.thop)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e1,tp)
 end
-function c81010002.atop(e,tp,eg,ep,ev,re,r,rp)
-    Duel.ChainAttack()
+function c81010002.thfilter(c)
+	return c:IsType(TYPE_RITUAL) and c:IsType(TYPE_PENDULUM) and c:IsAbleToHand() and c:IsFaceup()
 end
-
+function c81010002.thcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(c81010002.thfilter,tp,LOCATION_REMOVED,0,1,nil)
+end
+function c81010002.thop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c81010002.thfilter),tp,LOCATION_REMOVED,0,1,1,nil)
+	local tc=g:GetFirst()
+	if tc then
+		Duel.SendtoHand(tc,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,tc)
+	end
+end

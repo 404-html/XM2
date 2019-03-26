@@ -1,58 +1,92 @@
---HappySky·岛村卯月
 function c81007001.initial_effect(c)
-	--special summon
+	--link summon
+	aux.AddLinkProcedure(c,nil,2,99,c81007001.lcheck)
+	c:EnableReviveLimit()
+	--double damage
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_SPSUMMON_PROC)
-	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-	e1:SetRange(LOCATION_HAND)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1,81007001)
-	e1:SetCondition(c81007001.spcon)
-	e1:SetValue(1)
+	e1:SetCondition(c81007001.dbcon)
+	e1:SetTarget(c81007001.dbtg)
+	e1:SetOperation(c81007001.dbop)
 	c:RegisterEffect(e1)
-	--effect gain
+	--special summon
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_BE_MATERIAL)
-	e2:SetCondition(c81007001.efcon)
-	e2:SetOperation(c81007001.efop)
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e2:SetCode(EVENT_TO_GRAVE)
+	e2:SetCountLimit(1,81007091)
+	e2:SetCondition(c81007001.spcon)
+	e2:SetTarget(c81007001.sptg)
+	e2:SetOperation(c81007001.spop)
 	c:RegisterEffect(e2)
 end
-function c81007001.spcon(e,c)
-	if c==nil then return true end
-	local tp=c:GetControler()
-	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+function c81007001.lcheck(g,lc)
+	return g:IsExists(Card.IsLinkType,1,nil,TYPE_DUAL)
 end
-function c81007001.efcon(e,tp,eg,ep,ev,re,r,rp)
-	return r==REASON_LINK
+function c81007001.dbcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsAbleToEnterBP()
 end
-function c81007001.efop(e,tp,eg,ep,ev,re,r,rp)
+function c81007001.dbfilter(c)
+	return c:IsFaceup() and c:IsType(TYPE_DUAL) and c:IsType(TYPE_MONSTER)and c:GetFlagEffect(81007001)==0
+end
+function c81007001.dbtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c81007001.dbfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c81007001.dbfilter,tp,LOCATION_MZONE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	Duel.SelectTarget(tp,c81007001.dbfilter,tp,LOCATION_MZONE,0,1,1,nil)
+end
+function c81007001.dbop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local rc=c:GetReasonCard()
-	local e1=Effect.CreateEffect(rc)
+	local tc=Duel.GetFirstTarget()
+	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_UPDATE_ATTACK)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e1:SetTarget(c81007001.tgtg)
-	e1:SetValue(300)
-	rc:RegisterEffect(e1,true)
-	local e2=e1:Clone()
-	e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-	e2:SetValue(1)
-	rc:RegisterEffect(e2,true)
-	if not rc:IsType(TYPE_EFFECT) then
-		local e3=Effect.CreateEffect(c)
-		e3:SetType(EFFECT_TYPE_SINGLE)
-		e3:SetCode(EFFECT_ADD_TYPE)
-		e3:SetValue(TYPE_EFFECT)
-		e3:SetReset(RESET_EVENT+RESETS_STANDARD)
-		rc:RegisterEffect(e3,true)
+	e1:SetCode(EFFECT_CANNOT_ATTACK)
+	e1:SetTargetRange(LOCATION_MZONE,0)
+	e1:SetTarget(c81007001.ftarget)
+	e1:SetLabel(tc:GetFieldID())
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e1,tp)
+	if tc:IsRelateToEffect(e) then
+		tc:RegisterFlagEffect(81007001,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,0)
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+		e1:SetCode(EVENT_PRE_BATTLE_DAMAGE)
+		e1:SetCondition(c81007001.damcon)
+		e1:SetOperation(c81007001.damop)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		tc:RegisterEffect(e1)
 	end
-	rc:RegisterFlagEffect(0,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(81007001,1))
-	Duel.RegisterFlagEffect(tp,81007001,RESET_PHASE+PHASE_END,0,1)
 end
-function c81007001.tgtg(e,c)
-	return e:GetHandler():GetLinkedGroup():IsContains(c)
+function c81007001.ftarget(e,c)
+	return e:GetLabel()~=c:GetFieldID()
+end
+function c81007001.damcon(e,tp,eg,ep,ev,re,r,rp)
+	return ep~=tp and e:GetHandler():GetBattleTarget()~=nil
+end
+function c81007001.damop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.ChangeBattleDamage(ep,ev*3)
+end
+function c81007001.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsPreviousLocation(LOCATION_MZONE)
+end
+function c81007001.spfilter(c,e,tp)
+	return c:IsType(TYPE_NORMAL) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
+function c81007001.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c81007001.spfilter(chkc,e,tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingTarget(c81007001.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectTarget(tp,c81007001.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
+end
+function c81007001.spop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) then
+		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+	end
 end

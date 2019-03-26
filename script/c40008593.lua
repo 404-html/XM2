@@ -21,7 +21,7 @@ function c40008593.initial_effect(c)
 	c:RegisterEffect(e2)	
 end
 function c40008593.spfilter(c,e,tp)
-	return c:IsSetCard(0xf016) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:IsLevelBelow(4)
+	return c:IsSetCard(0xc016) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:IsLevelBelow(4)
 end
 function c40008593.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_DECK) and chkc:IsControler(tp) and c40008593.spfilter(chkc,e,tp) end
@@ -53,7 +53,7 @@ function c40008593.eqlimit(e,c)
 	return e:GetOwner()==c
 end
 function c40008593.filter(c)
-	return c:IsSetCard(0xf016) and c:IsFaceup()
+	return c:IsSetCard(0xc016) and c:IsFaceup()
 end
 function c40008593.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c40008593.filter,tp,LOCATION_REMOVED,0,1,nil) end

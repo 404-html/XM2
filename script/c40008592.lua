@@ -52,7 +52,7 @@ function c40008592.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c40008592.costfilter(c,lv)
-	return not c:IsLevel(lv) and c:IsSetCard(0xf016) and c:IsType(TYPE_MONSTER) and c:IsAbleToGraveAsCost() and not c:IsCode(40008592)
+	return not c:IsLevel(lv) and c:IsSetCard(0xc016) and c:IsType(TYPE_MONSTER) and c:IsAbleToGraveAsCost() and not c:IsCode(40008592)
 end
 function c40008592.lvcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local lv=e:GetHandler():GetLevel()

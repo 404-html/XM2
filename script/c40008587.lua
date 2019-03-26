@@ -26,7 +26,7 @@ function c40008587.initial_effect(c)
 	c:RegisterEffect(e2)	
 end
 function c40008587.spcfilter(c,tp)
-	return c:GetPreviousControler()==tp and c:IsSetCard(0xf016)
+	return c:GetPreviousControler()==tp and c:IsSetCard(0xc016)
 end
 function c40008587.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return not eg:IsContains(e:GetHandler()) and eg:IsExists(c40008587.spcfilter,1,nil,tp)

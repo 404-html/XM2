@@ -18,7 +18,8 @@ function c44460076.initial_effect(c)
 end
 --sset
 function c44460076.setfilter(c)
-	return c:IsSetCard(0x680) and not c:IsForbidden() and c:IsType(TYPE_MONSTER) 
+	return c:IsSetCard(0x680) and not c:IsForbidden() and c:IsType(TYPE_MONSTER)
+	and not c:IsCode(44460999)
 end
 function c44460076.tfilter(c)
 	return c:IsSetCard(0x679) and c:IsAbleToGrave()
@@ -27,7 +28,7 @@ function c44460076.stg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=eg:GetFirst()
 	if chk==0 then return Duel.IsExistingMatchingCard(c44460076.setfilter,tp,LOCATION_EXTRA+LOCATION_GRAVE,0,1,nil)
 	and Duel.IsExistingMatchingCard(c44460076.tfilter,tp,LOCATION_ONFIELD,0,1,nil)
-	and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 
+	and Duel.GetLocationCount(tp,LOCATION_SZONE)>-1 
 	and tc:IsSetCard(0x677)
 	and tc:GetControler()==tp end
 	tc:CreateEffectRelation(e)

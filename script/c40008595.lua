@@ -27,7 +27,7 @@ function c40008595.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EFFECT_CANNOT_DISABLE_SUMMON)
 	e1:SetProperty(EFFECT_FLAG_IGNORE_RANGE+EFFECT_FLAG_SET_AVAILABLE)
-	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0xf016))
+	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0xc016))
 	e1:SetRange(LOCATION_FZONE)
 	c:RegisterEffect(e1)
 	local e2=e1:Clone()
@@ -65,7 +65,7 @@ function c40008595.thop(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function c40008595.chainop(e,tp,eg,ep,ev,re,r,rp)
-	if re:GetHandler():IsSetCard(0xf016) and (re:IsActiveType(TYPE_MONSTER) or re:IsActiveType(TYPE_SPELL+TYPE_TRAP)) and ep==tp then
+	if re:GetHandler():IsSetCard(0xc016) and (re:IsActiveType(TYPE_MONSTER) or re:IsActiveType(TYPE_SPELL+TYPE_TRAP)) and ep==tp then
 		Duel.SetChainLimit(c40008595.chainlm)
 	end
 end
@@ -73,7 +73,7 @@ function c40008595.chainlm(e,rp,tp)
 	return tp==rp
 end
 function c40008595.filter(c,tp)
-	return c:IsFaceup() and c:IsSetCard(0xf016)
+	return c:IsFaceup() and c:IsSetCard(0xc016)
 end
 function c40008595.sumcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c40008595.filter,1,nil,tp)
