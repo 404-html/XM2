@@ -1,2 +1,3 @@
-# 520DIY Data
-520DIY Data 数据
+# 520DIY
+完整的YGODCG for 520数据
+QQ群:307688884
