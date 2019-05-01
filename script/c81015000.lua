@@ -1,4 +1,4 @@
---北上丽花
+--Answer·北上丽花
 function c81015000.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

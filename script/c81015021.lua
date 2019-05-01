@@ -13,7 +13,7 @@ function c81015021.initial_effect(c)
 	c:RegisterEffect(e1)
 	--atk up
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(47946130,1))
+	e2:SetDescription(aux.Stringid(81015021,1))
 	e2:SetCategory(CATEGORY_ATKCHANGE)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)

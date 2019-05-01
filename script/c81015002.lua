@@ -1,4 +1,4 @@
---剧场·北上丽花
+--Theater·北上丽花
 function c81015002.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon
