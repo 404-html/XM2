@@ -36,7 +36,7 @@ function c65020043.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c65020043.indtg(e,c)
-	return c:IsSetCard(0x3da4) and c:IsType(TYPE_SYNCHRO)
+	return c:IsSetCard(0x3da4) and c:IsType(TYPE_SYNCHRO) and c:IsFaceup()
 end
 
 function c65020043.hsptgfil(c)

@@ -8,6 +8,7 @@ function c65020129.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1,65020129)
+	e1:SetCost(c65020129.cost)
 	e1:SetTarget(c65020129.tg)
 	e1:SetOperation(c65020129.op)
 	c:RegisterEffect(e1)
@@ -36,6 +37,10 @@ function c65020129.damcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c65020129.damop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ChangeBattleDamage(ep,ev*2)
+end
+function c65020129.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
+	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
 end
 function c65020129.tgfil(c,tp)
 	return c:IsSetCard(0xcda4) and c:IsSSetable() and (Duel.GetLocationCount(tp,LOCATION_SZONE)>0 or c:IsType(TYPE_FIELD))

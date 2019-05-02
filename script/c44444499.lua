@@ -42,6 +42,7 @@ function c44444499.initial_effect(c)
 	e5:SetCategory(CATEGORY_RECOVER)
 	e5:SetCode(EVENT_TO_GRAVE)
 	e5:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e5:SetCondition(c44444499.condition)
 	e5:SetCost(c44444499.scost1)
 	e5:SetTarget(c44444499.stg)
 	e5:SetOperation(c44444499.sop)
@@ -49,6 +50,9 @@ function c44444499.initial_effect(c)
 	local e6=e5:Clone()
 	e6:SetCode(EVENT_REMOVE)
 	c:RegisterEffect(e6)
+end
+function c44444499.condition(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD+LOCATION_HAND)
 end
 function c44444499.cfilter(c)
 	return c:IsType(TYPE_NORMAL) and c:IsType(TYPE_MONSTER) and c:IsAttribute(ATTRIBUTE_WATER) and c:GetLevel()==4 
@@ -148,7 +152,7 @@ function c44444499.scost1(e,tp,eg,ep,ev,re,r,rp,chk)
     e:SetLabel(1)
     if chk==0 then return Duel.IsExistingMatchingCard(c44444499.filter1,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=Duel.SelectMatchingCard(tp,c44444499.cfilter1,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,c44444499.filter1,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 		local atk=g:GetFirst():GetTextAttack()
 	    if atk<0 then atk=0 end

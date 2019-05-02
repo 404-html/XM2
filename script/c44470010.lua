@@ -6,6 +6,7 @@ function c44470010.initial_effect(c)
 	--To Grave
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(44470010,0))
+	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_END_PHASE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCategory(CATEGORY_TOGRAVE)
 	e1:SetType(EFFECT_TYPE_QUICK_O)

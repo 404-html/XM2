@@ -1,22 +1,23 @@
 --叠光超载
 function c91000004.initial_effect(c)
-	--Activate
+ --Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(91000004,0))
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCountLimit(1,91000004+EFFECT_COUNT_CODE_OATH)
 	e1:SetTarget(c91000004.target)
 	e1:SetOperation(c91000004.activate)
 	c:RegisterEffect(e1)
 end
 function c91000004.filter(c,tp)
-	if not c:IsType(TYPE_XYZ) and c:GetOverlayCount()>0 then return false end
 	local g=Duel.GetDecktopGroup(tp,c:GetOverlayCount())
-	return g:FilterCount(Card.IsAbleToRemove,nil)==c:GetOverlayCount()
+		return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:GetOverlayCount()>0
+		and g:FilterCount(Card.IsAbleToGrave,nil)==c:GetOverlayCount()
 end
 function c91000004.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-   if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c91000004.filter(chkc) end
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c91000004.filter(chkc) end
 	if chk==0 then return e:IsHasType(EFFECT_TYPE_ACTIVATE)
 		and Duel.IsExistingTarget(c91000004.filter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)

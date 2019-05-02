@@ -1,4 +1,4 @@
---F.A.シティGP
+--F.A. City Grand Prix
 function c1061200.initial_effect(c)
 	--activate
 	local e1=Effect.CreateEffect(c)

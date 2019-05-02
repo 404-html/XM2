@@ -1,5 +1,6 @@
 --御三家·秘技 爆炸烈焰
 local m=77010014
+local set=0x9eef
 local cm=_G["c"..m]
 function cm.initial_effect(c)
 	--rec or dam
@@ -8,7 +9,7 @@ function cm.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCountLimit(1,m)
+	e1:SetCountLimit(1,m+EFFECT_COUNT_CODE_SINGLE)
 	e1:SetCost(cm.cost)
 	e1:SetTarget(cm.ractg)
 	e1:SetOperation(cm.racop)

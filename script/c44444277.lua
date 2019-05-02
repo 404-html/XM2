@@ -33,9 +33,11 @@ function c44444277.initial_effect(c)
 	--back
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e5:SetDescription(aux.Stringid(44444277,1))
 	e5:SetCategory(CATEGORY_DAMAGE)
 	e5:SetCode(EVENT_TO_GRAVE)
 	e5:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e5:SetCondition(c44444277.condition)
 	e5:SetCost(c44444277.scost1)
 	e5:SetTarget(c44444277.stg)
 	e5:SetOperation(c44444277.sop)
@@ -73,6 +75,9 @@ function c44444277.retop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 --back
+function c44444277.condition(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
+end
 function c44444277.filter1(c)
 	return c:IsAbleToDeck()
 end  
