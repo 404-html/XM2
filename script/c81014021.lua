@@ -1,106 +1,113 @@
---Wings·吉冈沙纪
+--索菲·托莱特
 function c81014021.initial_effect(c)
-	--fusion material
+	--xyz summon
+	aux.AddXyzProcedure(c,nil,3,2)
 	c:EnableReviveLimit()
-	aux.AddFusionProcCode2(c,81013000,81012044,false,false)
-	--code
+	--pendulum summon
+	aux.EnablePendulumAttribute(c,false)
+	--synchro effect
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e1:SetCode(EFFECT_CHANGE_CODE)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetValue(81012044)
+	e1:SetDescription(aux.Stringid(81014021,2))
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetType(EFFECT_TYPE_QUICK_O)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
+	e1:SetRange(LOCATION_PZONE)
+	e1:SetCondition(c81014021.sccon)
+	e1:SetCost(c81014021.sccost)
+	e1:SetTarget(c81014021.sctg)
+	e1:SetOperation(c81014021.scop)
 	c:RegisterEffect(e1)
-	--spsummon
+	--atk limit
 	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_TO_GRAVE)
-	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
-	e2:SetCountLimit(1,81014021)
-	e2:SetCondition(c81014021.sscon)
-	e2:SetTarget(c81014021.sstg)
-	e2:SetOperation(c81014021.ssop)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_CANNOT_SELECT_BATTLE_TARGET)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetTargetRange(0,LOCATION_MZONE)
+	e2:SetValue(c81014021.atlimit)
 	c:RegisterEffect(e2)
-	--spsummon condition
+	--attack up
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e3:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e3:SetValue(c81014021.splimit)
+	e3:SetType(EFFECT_TYPE_QUICK_O)
+	e3:SetCode(EVENT_FREE_CHAIN)
+	e3:SetCountLimit(1)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCost(c81014021.cost)
+	e3:SetOperation(c81014021.operation)
 	c:RegisterEffect(e3)
-	--special summon rule
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_FIELD)
-	e4:SetCode(EFFECT_SPSUMMON_PROC)
-	e4:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-	e4:SetRange(LOCATION_EXTRA)
-	e4:SetCondition(c81014021.spcon)
-	e4:SetOperation(c81014021.spop)
-	c:RegisterEffect(e4)
-	--extra summon
-	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_FIELD)
-	e5:SetTargetRange(LOCATION_HAND+LOCATION_MZONE,0)
-	e5:SetCode(EFFECT_EXTRA_SUMMON_COUNT)
-	e5:SetRange(LOCATION_MZONE)
-	c:RegisterEffect(e5)
-	local e6=e5:Clone()
-	e6:SetCode(EFFECT_EXTRA_SET_COUNT)
+	--pendulum
+	local e6=Effect.CreateEffect(c)
+	e6:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e6:SetCode(EVENT_DESTROYED)
+	e6:SetProperty(EFFECT_FLAG_DELAY)
+	e6:SetCondition(c81014021.pencon)
+	e6:SetTarget(c81014021.pentg)
+	e6:SetOperation(c81014021.penop)
 	c:RegisterEffect(e6)
 end
-function c81014021.splimit(e,se,sp,st)
-	return not e:GetHandler():IsLocation(LOCATION_EXTRA)
+c81014021.pendulum_level=3
+function c81014021.sccon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()~=tp
+		and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2)
 end
-function c81014021.matfilter(c)
-	return c:IsFusionCode(81013000,81012044) and c:IsAbleToDeckOrExtraAsCost()
+function c81014021.sccost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
+	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
-function c81014021.spfilter1(c,tp,g)
-	return g:IsExists(c81014021.spfilter2,1,c,tp,c)
-end
-function c81014021.spfilter2(c,tp,mc)
-	return (c:IsFusionCode(81013000) and mc:IsFusionCode(81012044)
-		or c:IsFusionCode(81012044) and mc:IsFusionCode(81013000))
-		and Duel.GetLocationCountFromEx(tp,tp,Group.FromCards(c,mc))>0
-end
-function c81014021.spcon(e,c)
-	if c==nil then return true end
-	local tp=c:GetControler()
-	local g=Duel.GetMatchingGroup(c81014021.matfilter,tp,LOCATION_ONFIELD,0,nil)
-	return g:IsExists(c81014021.spfilter1,1,nil,tp,g)
-end
-function c81014021.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.GetMatchingGroup(c81014021.matfilter,tp,LOCATION_ONFIELD,0,nil)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g1=g:FilterSelect(tp,c81014021.spfilter1,1,1,nil,tp,g)
-	local mc=g1:GetFirst()
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g2=g:FilterSelect(tp,c81014021.spfilter2,1,1,mc,tp,mc)
-	g1:Merge(g2)
-	local cg=g1:Filter(Card.IsFacedown,nil)
-	if cg:GetCount()>0 then
-		Duel.ConfirmCards(1-tp,cg)
+function c81014021.sctg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then
+		local mg=Duel.GetMatchingGroup(Card.IsRace,tp,LOCATION_MZONE,0,nil,RACE_ZOMBIE)
+		return Duel.IsExistingMatchingCard(Card.IsSynchroSummonable,tp,LOCATION_EXTRA,0,1,nil,nil,mg)
+		and e:GetHandler():GetFlagEffect(81014021)==0
 	end
-	Duel.SendtoDeck(g1,nil,2,REASON_COST)
+	e:GetHandler():RegisterFlagEffect(81014021,RESET_CHAIN,0,1)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
-function c81014021.sscon(e,tp,eg,ep,ev,re,r,rp)
+function c81014021.scop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
+	local mg=Duel.GetMatchingGroup(Card.IsRace,tp,LOCATION_MZONE,0,nil,RACE_ZOMBIE)
+	local g=Duel.GetMatchingGroup(Card.IsSynchroSummonable,tp,LOCATION_EXTRA,0,nil,nil,mg)
+	if g:GetCount()>0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local sg=g:Select(tp,1,1,nil)
+		Duel.SynchroSummon(tp,sg:GetFirst(),nil,mg)
+	end
+end
+function c81014021.atlimit(e,c)
+	return c~=e:GetHandler()
+end
+function c81014021.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
+end
+function c81014021.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP)
-		and c:GetPreviousControler()==tp
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e1:SetTargetRange(LOCATION_MZONE,0)
+	e1:SetTarget(c81014021.etarget)
+	e1:SetValue(1)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e1,tp)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	Duel.RegisterEffect(e2,tp)
 end
-function c81014021.ssfilter(c,e,tp)
-	return c:IsCode(81012044) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+function c81014021.etarget(e,c)
+	return c:IsFaceup() and c:IsRace(RACE_ZOMBIE)
 end
-function c81014021.sstg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(c81014021.ssfilter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE)
+function c81014021.pencon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsFaceup()
 end
-function c81014021.ssop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local tc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c81014021.ssfilter),tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,e,tp):GetFirst()
-	if tc then
-		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+function c81014021.pentg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1) end
+end
+function c81014021.penop(e,tp,eg,ep,ev,re,r,rp)
+	if not Duel.CheckLocation(tp,LOCATION_PZONE,0) and not Duel.CheckLocation(tp,LOCATION_PZONE,1) then return end
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) then
+		Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 	end
 end

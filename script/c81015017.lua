@@ -1,4 +1,5 @@
 --怦然心动·北上丽花
+require("expansions/script/c81000000")
 function c81015017.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -6,6 +7,7 @@ function c81015017.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCountLimit(1,81015017)
 	e1:SetTarget(c81015017.target)
 	e1:SetOperation(c81015017.activate)
 	c:RegisterEffect(e1)
@@ -16,10 +18,17 @@ function c81015017.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e2:SetRange(LOCATION_GRAVE)
+	e2:SetCountLimit(1,81015917)
 	e2:SetCondition(c81015017.spcon)
 	e2:SetTarget(c81015017.sptg)
 	e2:SetOperation(c81015017.spop)
 	c:RegisterEffect(e2)
+	--act in hand
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_TRAP_ACT_IN_HAND)
+	e3:SetCondition(Tenka.ReikaCon)
+	c:RegisterEffect(e3)
 end
 function c81015017.filter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP)
@@ -37,22 +46,19 @@ function c81015017.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end
-function c81015017.descfilter(c)
-	return c:GetSequence()<5
-end
 function c81015017.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.IsExistingMatchingCard(c81015017.descfilter,tp,LOCATION_SZONE,0,1,nil)
+	return Tenka.ReikaCon(e)
 		and Duel.GetAttacker():IsControler(1-tp)
 end
 function c81015017.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not e:GetHandler():IsStatus(STATUS_CHAINING) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,81015017,0x814,0x11,1800,2700,6,RACE_FAIRY,ATTRIBUTE_EARTH) end
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,81015017,0x81a,0x11,1800,2700,6,RACE_FAIRY,ATTRIBUTE_EARTH) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c81015017.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and Duel.IsPlayerCanSpecialSummonMonster(tp,81015017,0x814,0x11,1800,2700,6,RACE_FAIRY,ATTRIBUTE_EARTH) then
+	if c:IsRelateToEffect(e) and Duel.IsPlayerCanSpecialSummonMonster(tp,81015017,0x81a,0x11,1800,2700,6,RACE_FAIRY,ATTRIBUTE_EARTH) then
 		c:AddMonsterAttribute(TYPE_NORMAL)
 		Duel.SpecialSummonStep(c,1,tp,tp,true,false,POS_FACEUP_DEFENSE)
 		--redirect

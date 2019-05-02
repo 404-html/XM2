@@ -9,6 +9,7 @@ function c65020127.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1,65020127)
+	e1:SetCost(c65020127.cost)
 	e1:SetTarget(c65020127.tg)
 	e1:SetOperation(c65020127.op)
 	c:RegisterEffect(e1)
@@ -34,7 +35,10 @@ end
 function c65020127.atlimit(e,c)
 	return not c:IsCode(65020127) and c:IsSetCard(0xcda4)
 end
-
+function c65020127.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
+	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
+end
 function c65020127.tgfil(c)
 	return c:IsSetCard(0xcda4) and c:IsAbleToHand()
 end

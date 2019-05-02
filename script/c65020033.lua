@@ -26,7 +26,7 @@ function c65020033.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1)
+	e2:SetCountLimit(1,65020043)
 	e2:SetTarget(c65020033.spdtg)
 	e2:SetOperation(c65020033.spdop)
 	c:RegisterEffect(e2)
@@ -71,7 +71,7 @@ function c65020033.sprop(e,tp,eg,ep,ev,re,r,rp,c)
 end
 
 function c65020033.filter(c,e,tp)
-	return c:IsRace(RACE_ZOMBIE) and c:GetLevel()>=5 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x3da4) and c:GetLevel()>=5 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c65020033.spdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and c65020033.filter(chkc,e,tp) end

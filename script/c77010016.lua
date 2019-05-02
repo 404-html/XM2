@@ -1,5 +1,6 @@
 --御三家·秘技 加农水炮
 local m=77010016
+local set=0x9eef
 local cm=_G["c"..m]
 function cm.initial_effect(c)
 	--Activate
@@ -55,14 +56,14 @@ end
 function cm.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToDeck() and Duel.IsPlayerCanDraw(tp,1) end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,e:GetHandler(),1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
+	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,1000)
 end
 function cm.thop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.SendtoDeck(c,nil,0,REASON_EFFECT)~=0 and c:IsLocation(LOCATION_DECK) then
-		Duel.ShuffleDeck(tp)
+		Duel.ShuffleHand(p)
 		Duel.BreakEffect()
-		Duel.Draw(tp,1,REASON_EFFECT)
+		Duel.Recover(tp,1000,REASON_EFFECT)
 	end
 end
 

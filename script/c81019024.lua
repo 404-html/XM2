@@ -1,45 +1,62 @@
---命运之时·天海春香
+--美国·圣地亚鸽
 function c81019024.initial_effect(c)
-	--xyz summon
-	aux.AddXyzProcedure(c,nil,10,2)
-	c:EnableReviveLimit()
-	--indes
+	--Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e1:SetValue(1)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	--damage val
+	--cannot be target
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_NO_BATTLE_DAMAGE)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	e2:SetRange(LOCATION_FZONE)
+	e2:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+	e2:SetTarget(c81019024.target)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
-	e3:SetValue(1)
+	local e3=e2:Clone()
+	e3:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+	e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	c:RegisterEffect(e3)
-	--atklimit
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e4:SetCode(EFFECT_UPDATE_ATTACK)
-	e4:SetRange(LOCATION_MZONE)
-	e4:SetValue(c81019024.atkval)
-	c:RegisterEffect(e4)
-	--remove material
-	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e5:SetCode(EVENT_BATTLED)
-	e5:SetOperation(c81019024.rmop)
-	c:RegisterEffect(e5)
+	--destroy
+	local e2=Effect.CreateEffect(c)
+	e2:SetCategory(CATEGORY_DESTROY)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e2:SetRange(LOCATION_FZONE)
+	e2:SetCountLimit(1)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e2:SetCondition(c81019024.descon)
+	e2:SetTarget(c81019024.destg)
+	e2:SetOperation(c81019024.desop)
+	c:RegisterEffect(e2)
+	--spsummon
+	local e3=aux.AddRitualProcGreaterCode(c,81019025)
+	e3:SetType(EFFECT_TYPE_IGNITION)
+	e3:SetCode(0)
+	e3:SetRange(LOCATION_GRAVE)
+	e3:SetCost(aux.bfgcost)
 end
-function c81019024.atkval(e,c)
-	return Duel.GetOverlayCount(c:GetControler(),1,1)*1000
+function c81019024.target(e,c)
+	return c:IsType(TYPE_NORMAL) and c:IsType(TYPE_PENDULUM)
 end
-function c81019024.rmop(e,tp,eg,ep,ev,re,r,rp)
-	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_EFFECT)
+function c81019024.cfilter(c,tp)
+	return c:IsFaceup() and c:IsType(TYPE_NORMAL) and c:IsType(TYPE_PENDULUM) and c:IsControler(tp)
+end
+function c81019024.descon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(c81019024.cfilter,1,nil,tp)
+end
+function c81019024.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsOnField() end
+	if chk==0 then return Duel.IsExistingTarget(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	local g=Duel.SelectTarget(tp,nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
+end
+function c81019024.desop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
+	local tc=Duel.GetFirstTarget()
+	if tc and tc:IsRelateToEffect(e) then
+		Duel.Destroy(tc,REASON_EFFECT)
+	end
 end

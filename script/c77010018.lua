@@ -98,7 +98,7 @@ function cm.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 	--atkup
 function cm.atkval(e,c)
-	return Duel.GetFieldGroupCount(0,LOCATION_ONFIELD,0)*300
+	return Duel.GetFieldGroupCount(c:GetControler(),LOCATION_ONFIELD,0)*300
 end
 	--to hand
 function cm.thcon(e,tp,eg,ep,ev,re,r,rp)

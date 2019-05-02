@@ -24,6 +24,7 @@ function c44480009.initial_effect(c)
 end
 function c44480009.matfilter(c)
 	return c:IsLinkSetCard(0x646)
+	and not c:IsLinkCode(44480009)
 	--and bit.band(c:GetSummonType(),SUMMON_TYPE_NORMAL)==SUMMON_TYPE_NORMAL
 end
 --atk1/2

@@ -1,5 +1,6 @@
 --御三家·秘技 疯狂植物
 local m=77010012
+local set=0x9eef
 local cm=_G["c"..m]
 function cm.initial_effect(c)
 	--Activate

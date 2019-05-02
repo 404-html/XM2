@@ -1,4 +1,4 @@
---ヴェンデット・キマイラ
+--Vendread Chimera
 function c13482075.initial_effect(c)
 	c:EnableReviveLimit()
 	--Negate

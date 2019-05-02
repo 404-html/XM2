@@ -33,8 +33,8 @@ function c44480010.initial_effect(c)
 	e21:SetType(EFFECT_TYPE_IGNITION)
 	e21:SetRange(LOCATION_ONFIELD)
 	e21:SetCountLimit(1,44481010)
-	e21:SetTarget(c44480009.target)
-	e21:SetOperation(c44480009.operation)
+	e21:SetTarget(c44480010.target)
+	e21:SetOperation(c44480010.operation)
 	c:RegisterEffect(e21)
 end
 function c44480010.eqfilter(c)
@@ -85,16 +85,16 @@ function c44480010.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 --search
-function c44480009.thfilter(c)
-	return c:IsAbleToHand() and (c:IsCode(44480100) or c:IsSetCard(0x647))  
+function c44480010.thfilter(c)
+	return c:IsAbleToHand() and (c:IsCode(44480020) or c:IsSetCard(0x647))  
 end
-function c44480009.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c44480010.target(e,tp,eg,ep,ev,re,r,rp,chk)
     local c=e:GetHandler()
-	if chk==0 then return Duel.IsExistingMatchingCard(c44480009.thfilter,tp,LOCATION_DECK,0,1,nil) 
+	if chk==0 then return Duel.IsExistingMatchingCard(c44480010.thfilter,tp,LOCATION_DECK,0,1,nil) 
 	and not c:IsHasEffect(EFFECT_REVERSE_UPDATE) and c:GetAttack()>=1000 end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
-function c44480009.operation(e,tp,eg,ep,ev,re,r,rp)
+function c44480010.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 		if c:IsRelateToEffect(e) and c:IsFaceup() and c:GetAttack()>=1000 then
 		local e1=Effect.CreateEffect(c)
@@ -105,7 +105,7 @@ function c44480009.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(-1000)
 		c:RegisterEffect(e1)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,c44480009.thfilter,tp,LOCATION_DECK,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,c44480010.thfilter,tp,LOCATION_DECK,0,1,1,nil)
 	    local tc=g:GetFirst()
         Duel.SendtoHand(tc,nil,REASON_EFFECT)
 	end

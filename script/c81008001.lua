@@ -1,3 +1,4 @@
+--Answer·早坂美玲
 function c81008001.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

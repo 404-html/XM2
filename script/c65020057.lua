@@ -35,16 +35,16 @@ function c65020057.gvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.SelectTarget(tp,c65020057.gvfilter,tp,LOCATION_MZONE,0,1,1,nil)
 end
 function c65020057.gvop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(tc)
-		e1:SetDescription(aux.Stringid(65020057,1))
+		e1:SetDescription(aux.Stringid(65020057,0))
 		e1:SetCategory(CATEGORY_DESTROY)
 		e1:SetType(EFFECT_TYPE_QUICK_O)
 		e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 		e1:SetCode(EVENT_CHAINING)
 		e1:SetRange(LOCATION_MZONE)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		e1:SetCountLimit(1)
 		e1:SetCondition(c65020057.gavcon)
 		e1:SetTarget(c65020057.gavtg)
