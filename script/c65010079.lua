@@ -11,7 +11,7 @@ function c65010079.initial_effect(c)
 end
 c65010079.setname="RagnaTravellers"
 function c65010079.filter(c)
-	return c.setname=="RagnaTravellers" or c:IsCode(65010082)
+	return (c.setname=="RagnaTravellers" or c:IsCode(65010082)) and c:IsFaceup()
 end
 function c65010079.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c65010079.filter(chkc) end

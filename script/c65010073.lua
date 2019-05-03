@@ -1,7 +1,7 @@
 --终末旅者指挥 千户长
 function c65010073.initial_effect(c)
 	--synchro summon
-	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsType,TYPE_SYNCHRO),aux.NonTuner(nil),1)
+	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsType,TYPE_SYNCHRO),c65010073.matfil,1)
 	c:EnableReviveLimit()
 	--splimit
 	local e0=Effect.CreateEffect(c)
@@ -46,6 +46,9 @@ function c65010073.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 c65010073.setname="RagnaTravellers"
+function c65010073.matfil(c)
+	return c.setname=="RagnaTravellers" and not c:IsType(TYPE_TUNER) 
+end
 function c65010073.chcon(e,tp,eg,ep,ev,re,r,rp)
 	local rc=re:GetHandler()
 	local check=0
@@ -57,7 +60,7 @@ function c65010073.chcon(e,tp,eg,ep,ev,re,r,rp)
 			tc=g:GetNext()
 		end
 	end
-	return rp==1-tp and ((re:GetActivateLocation()~=LOCATION_ONFIELD and not re:IsHasType(EFFECT_TYPE_ACTIVATE)) or check==1)
+	return rp==1-tp and (((re:GetActivateLocation()~=LOCATION_MZONE and re:GetActivateLocation()~=LOCATION_SZONE) and not re:IsHasType(EFFECT_TYPE_ACTIVATE)) or check==1)
 end
 function c65010073.chtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
