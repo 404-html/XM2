@@ -52,3 +52,24 @@ function Tenka.Shibuya(c)
 	e8:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL)
 	c:RegisterEffect(e8)
 end
+--Reverse
+function Tenka.Reverse(c)
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e0:SetCode(EVENT_ADJUST)
+	e0:SetRange(LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_HAND+LOCATION_EXTRA)
+	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE)
+	e0:SetCondition(Tenka.backon)
+	e0:SetOperation(Tenka.backop)
+	c:RegisterEffect(e0)
+end
+function Tenka.backon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c.dfc_front_side and c:GetOriginalCode()==c.dfc_back_side
+end
+function Tenka.backop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local tcode=c.dfc_front_side
+	c:SetEntityCode(tcode)
+	c:ReplaceEffect(tcode,0,0)
+end
