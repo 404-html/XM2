@@ -1,5 +1,15 @@
 --形魔-瑞克坦
 function c21520162.initial_effect(c)
+	--cost
+	local e00=Effect.CreateEffect(c)
+	e00:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e00:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
+	e00:SetCode(EVENT_PHASE+PHASE_END)
+	e00:SetCountLimit(1)
+	e00:SetRange(LOCATION_MZONE)
+	e00:SetCondition(c21520162.ccon)
+	e00:SetOperation(c21520162.ccost)
+	c:RegisterEffect(e00)
 	--Attribute Light
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -8,27 +18,6 @@ function c21520162.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetValue(ATTRIBUTE_LIGHT)
 	c:RegisterEffect(e1)
-	--cost
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
-	e2:SetCode(EVENT_PHASE+PHASE_END)
-	e2:SetCountLimit(1)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCondition(c21520162.ccon)
-	e2:SetOperation(c21520162.ccost)
-	c:RegisterEffect(e2)
-	--base atk & def
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_UPDATE_ATTACK)
-	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetValue(c21520162.adval)
-	c:RegisterEffect(e3)
-	local e4=e3:Clone()
-	e4:SetCode(EFFECT_UPDATE_DEFENSE)
-	c:RegisterEffect(e4)
 	--draw
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(21520162,3))
@@ -37,7 +26,6 @@ function c21520162.initial_effect(c)
 	e5:SetCode(EVENT_SUMMON_SUCCESS)
 	e5:SetProperty(EFFECT_FLAG_DELAY)
 	e5:SetRange(LOCATION_MZONE)
---	e5:SetCost(c21520162.cost)
 	e5:SetTarget(c21520162.target)
 	e5:SetOperation(c21520162.activate)
 	c:RegisterEffect(e5)
@@ -54,6 +42,7 @@ end
 function c21520162.ccost(e,tp)
 	if tp~=Duel.GetTurnPlayer() then return end
 	local c=e:GetHandler()
+	Duel.HintSelection(Group.FromCards(c))
 	local g1=Duel.GetMatchingGroup(c21520162.cfilter1,tp,LOCATION_HAND,0,nil)
 	local opselect=2
 	if g1:GetCount()>0 then
@@ -86,48 +75,30 @@ function c21520162.ccost(e,tp)
 		Duel.Destroy(e:GetHandler(),REASON_RULE)
 	end
 end
-function c21520162.adval(e,c)
-	return Duel.GetFieldGroupCount(c:GetControler(),LOCATION_HAND,0)*200
-end
-function c21520162.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_BATTLE_PHASE)==0
-		and Duel.GetActivityCount(tp,ACTIVITY_SPSUMMON)==0 
-		end
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetTargetRange(1,0)
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e1,tp)
-	local e2=e1:Clone()
-	e2:SetCode(EFFECT_CANNOT_BP)
-	Duel.RegisterEffect(e2,tp)
-end
 function c21520162.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp) end
+	Duel.SetTargetPlayer(tp)
+	Duel.SetTargetParam(1)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
-function c21520162.smfilter(c,e,tp)
-	return c:IsSetCard(0x490) and (c:IsCanBeSpecialSummoned(e,0,tp,false,false) or c:IsAbleToGrave())
-end
 function c21520162.activate(e,tp,eg,ep,ev,re,r,rp)
-	if not Duel.IsPlayerCanDraw(tp) then return end
-	Duel.Draw(tp,1,REASON_EFFECT)
+	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+	if not Duel.IsPlayerCanDraw(p) then return end
+	Duel.Draw(p,d,REASON_EFFECT)
 	Duel.BreakEffect()
-	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 and Duel.SelectYesNo(tp,aux.Stringid(21520162,6)) then 
-		local g=Duel.GetDecktopGroup(tp,1)
-		Duel.ConfirmDecktop(tp,1)
+	if Duel.GetFieldGroupCount(p,LOCATION_DECK,0)>0 and Duel.SelectYesNo(p,aux.Stringid(21520162,6)) then 
+		local g=Duel.GetDecktopGroup(p,1)
+		Duel.ConfirmDecktop(p,1)
 		local tc=g:GetFirst()
 		local ops=2
-		if tc:IsSetCard(0x490) and (tc:IsCanBeSpecialSummoned(e,0,tp,false,false) or tc:IsAbleToGrave()) then 
-			if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then ops=Duel.SelectOption(tp,aux.Stringid(21520162,4),aux.Stringid(21520162,5)) 
+		if tc:IsSetCard(0x490) and (tc:IsCanBeSpecialSummoned(e,0,p,false,false) or tc:IsAbleToGrave()) then 
+			if Duel.GetLocationCount(p,LOCATION_MZONE)>0 then ops=Duel.SelectOption(p,aux.Stringid(21520162,4),aux.Stringid(21520162,5)) 
 			else 
 				ops=1 
-				Duel.Hint(HINT_OPSELECTED,1-tp,aux.Stringid(21520162,5))
+				Duel.Hint(HINT_OPSELECTED,1-p,aux.Stringid(21520162,5))
 			end
 			if ops==0 then 
-				Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+				Duel.SpecialSummon(g,0,p,p,false,false,POS_FACEUP)
 			elseif ops==1 then 
 				Duel.SendtoGrave(g,REASON_EFFECT)
 			end

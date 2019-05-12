@@ -1,5 +1,15 @@
 --形魔-克洛萨
 function c21520165.initial_effect(c)
+	--cost
+	local e00=Effect.CreateEffect(c)
+	e00:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e00:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
+	e00:SetCode(EVENT_PHASE+PHASE_END)
+	e00:SetCountLimit(1)
+	e00:SetRange(LOCATION_MZONE)
+	e00:SetCondition(c21520165.ccon)
+	e00:SetOperation(c21520165.ccost)
+	c:RegisterEffect(e00)
 	--Attribute Dark
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -8,16 +18,6 @@ function c21520165.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetValue(ATTRIBUTE_DARK)
 	c:RegisterEffect(e1)
-	--cost
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
-	e2:SetCode(EVENT_PHASE+PHASE_END)
-	e2:SetCountLimit(1)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCondition(c21520165.ccon)
-	e2:SetOperation(c21520165.ccost)
-	c:RegisterEffect(e2)
 	--summon with no tribute
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(21520165,3))
@@ -33,7 +33,7 @@ function c21520165.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_IGNITION)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCountLimit(1)
-	e4:SetCost(c21520165.cost)
+	e4:SetCost(c21520165.cost1)
 	e4:SetOperation(c21520165.operation)
 	c:RegisterEffect(e4)
 	--negate
@@ -61,6 +61,7 @@ end
 function c21520165.ccost(e,tp)
 	if tp~=Duel.GetTurnPlayer() then return end
 	local c=e:GetHandler()
+	Duel.HintSelection(Group.FromCards(c))
 	local g1=Duel.GetMatchingGroup(c21520165.cfilter1,tp,LOCATION_HAND,0,nil)
 	local opselect=2
 	if g1:GetCount()>0 then
@@ -113,8 +114,18 @@ function c21520165.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 	c:RegisterEffect(e2)
 end
 
-function c21520165.cfilter(c)
-	return (c:IsAttribute(ATTRIBUTE_LIGHT) or c:IsAttribute(ATTRIBUTE_DARK)) and c:IsAbleToGrave()
+function c21520165.cfilter(c,stname)
+	if stname==nil then 
+		return (c:IsAttribute(ATTRIBUTE_LIGHT) or c:IsAttribute(ATTRIBUTE_DARK)) and c:IsAbleToGrave()
+	else 
+		return c:IsSetCard(stname) and c:IsAbleToGrave()
+	end
+end
+function c21520165.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c21520165.cfilter,tp,LOCATION_DECK,0,1,nil,0x490) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local g=Duel.SelectMatchingCard(tp,c21520165.cfilter,tp,LOCATION_DECK,0,1,1,nil,0x490)
+	Duel.SendtoGrave(g,POS_FACEUP,REASON_COST)
 end
 function c21520165.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c21520165.cfilter,tp,LOCATION_DECK,0,1,nil) end

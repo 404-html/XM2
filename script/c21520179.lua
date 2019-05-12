@@ -18,6 +18,7 @@ function c21520179.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetCondition(c21520179.drcon)
+	e2:SetTarget(c21520179.drtg)
 	e2:SetOperation(c21520179.drop)
 	c:RegisterEffect(e2)
 end
@@ -93,6 +94,13 @@ end
 function c21520179.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsReason(REASON_RETURN) and bit.band(r,REASON_EFFECT)==REASON_EFFECT
 end
+function c21520179.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsPlayerCanDraw(tp) end
+	Duel.SetTargetPlayer(tp)
+	Duel.SetTargetParam(1)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
+end
 function c21520179.drop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Draw(tp,1,REASON_EFFECT)
+	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+	Duel.Draw(p,d,REASON_EFFECT)
 end

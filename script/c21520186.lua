@@ -36,6 +36,7 @@ function c21520186.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetCountLimit(1)
+	e3:SetCondition(c21520186.dacon)
 	e3:SetTarget(c21520186.datg)
 	e3:SetOperation(c21520186.daop)
 	c:RegisterEffect(e3)
@@ -45,6 +46,9 @@ function c21520186.dafilter(c)
 end
 function c21520186.dafilter1(c)
 	return c:IsSetCard(0x490) and c:IsFaceup()
+end
+function c21520186.dacon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetType()&(TYPE_SPELL+TYPE_CONTINUOUS)==TYPE_SPELL+TYPE_CONTINUOUS
 end
 function c21520186.datg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c21520186.dafilter1(chkc) end

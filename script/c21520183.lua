@@ -71,33 +71,45 @@ end
 function c21520183.splimit(e,se,sp,st)
 	return bit.band(st,SUMMON_TYPE_XYZ)==SUMMON_TYPE_XYZ or se:GetHandler()==e:GetHandler()
 end
-function c21520183.spfilter1(c)
-	return c:IsSetCard(0x490) and c:IsAbleToRemoveAsCost() and c:IsType(TYPE_MONSTER)
-end
-function c21520183.spfilter2(c)
-	return c:IsRace(RACE_FIEND) and c:IsAbleToRemoveAsCost() and c:IsType(TYPE_MONSTER)
-end
-function c21520183.spfilter3(c)
+function c21520183.spfilter(c)
 	return (c:IsSetCard(0x490) or c:IsRace(RACE_FIEND)) and c:IsAbleToRemoveAsCost() and c:IsType(TYPE_MONSTER)
+end
+function c21520183.spcheck(c,sg)
+	return c:IsSetCard(0x490) and c:IsType(TYPE_MONSTER) and sg:FilterCount(c21520183.spcheck2,c)+1==sg:GetCount()
+	and sg:FilterCount(Card.IsSetCard,c,0x490)>=2
+end
+function c21520183.spcheck2(c)
+	return c:IsRace(RACE_FIEND) and c:IsType(TYPE_MONSTER)
+end
+function c21520183.spgoal(c,tp,sg)
+	return sg:GetCount()>1 and Duel.GetLocationCountFromEx(tp,tp,sg)>0 and sg:IsExists(c21520183.spcheck,1,nil,sg)
+end
+function c21520183.spselect(c,tp,mg,sg)
+	sg:AddCard(c)
+	local res=c21520183.spgoal(c,tp,sg) or mg:IsExists(c21520183.spselect,1,sg,tp,mg,sg)
+	sg:RemoveCard(c)
+	return res
 end
 function c21520183.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	local g=Duel.GetMatchingGroup(c21520183.spfilter3,tp,LOCATION_MZONE+LOCATION_GRAVE,0,e:GetHandler())
-	return g:IsExists(c21520183.spfilter1,3,nil) and g:GetCount()>=3
+	local mg=Duel.GetMatchingGroup(c21520183.spfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,e:GetHandler())
+	local sg=Group.CreateGroup()
+	return mg:IsExists(c21520183.spselect,1,nil,tp,mg,sg)
 end
 function c21520183.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g1=Duel.GetMatchingGroup(c21520183.spfilter3,tp,LOCATION_MZONE+LOCATION_GRAVE,0,e:GetHandler())
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g2=g1:FilterSelect(tp,c21520183.spfilter1,3,3,nil)
-	g1:Sub(g2)
-	local g=Group.CreateGroup()
-	if Duel.SelectYesNo(tp,93) then
-		g=g1:Select(tp,1,g1:GetCount(),nil)
+	local mg=Duel.GetMatchingGroup(c21520183.spfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,e:GetHandler())
+	local sg=Group.CreateGroup()
+	while true do
+		local cg=mg:Filter(c21520183.spselect,sg,tp,mg,sg)
+		if cg:GetCount()==0
+			or (c21520183.spgoal(c,tp,sg) and not Duel.SelectYesNo(tp,210)) then break end
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+		local g=cg:Select(tp,1,1,nil)
+		sg:Merge(g)
 	end
-	g:Merge(g2)
-	c:SetMaterial(g)
-	Duel.Remove(g,POS_FACEUP,REASON_COST)
+	c:SetMaterial(sg)
+	Duel.Remove(sg,POS_FACEUP,REASON_COST)
 end
 function c21520183.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

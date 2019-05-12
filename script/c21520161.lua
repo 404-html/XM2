@@ -1,5 +1,15 @@
 --形魔-特瑞安格
 function c21520161.initial_effect(c)
+	--cost
+	local e00=Effect.CreateEffect(c)
+	e00:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e00:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
+	e00:SetCode(EVENT_PHASE+PHASE_END)
+	e00:SetCountLimit(1)
+	e00:SetRange(LOCATION_MZONE)
+	e00:SetCondition(c21520161.ccon)
+	e00:SetOperation(c21520161.ccost)
+	c:RegisterEffect(e00)
 	--Attribute Dark
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -8,26 +18,17 @@ function c21520161.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetValue(ATTRIBUTE_DARK)
 	c:RegisterEffect(e1)
-	--cost
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
-	e2:SetCode(EVENT_PHASE+PHASE_END)
-	e2:SetCountLimit(1)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCondition(c21520161.ccon)
-	e2:SetOperation(c21520161.ccost)
-	c:RegisterEffect(e2)
-	--destroyed replace
+	--indes
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
+	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e3:SetCode(EFFECT_DESTROY_REPLACE)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCondition(c21520161.adcon)
-	e3:SetTarget(c21520161.adtg)
-	e3:SetOperation(c21520161.adop)
+	e3:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e3:SetValue(1)
 	c:RegisterEffect(e3)
+	local e4=e3:Clone()
+	e4:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	c:RegisterEffect(e4)
 end
 function c21520161.cfilter1(c)
 	return c:IsType(TYPE_MONSTER) and c:IsAttribute(ATTRIBUTE_LIGHT) and not c:IsPublic()
@@ -38,6 +39,7 @@ end
 function c21520161.ccost(e,tp)
 	if tp~=Duel.GetTurnPlayer() then return end
 	local c=e:GetHandler()
+	Duel.HintSelection(Group.FromCards(c))
 	local g1=Duel.GetMatchingGroup(c21520161.cfilter1,tp,LOCATION_HAND,0,nil)
 	local opselect=2
 	if g1:GetCount()>0 then
@@ -70,6 +72,7 @@ function c21520161.ccost(e,tp)
 		Duel.Destroy(e:GetHandler(),REASON_RULE)
 	end
 end
+--[[
 function c21520161.indval(e,re,tp)
 	return tp~=e:GetHandlerPlayer()
 end
@@ -110,4 +113,4 @@ function c21520161.adop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		c:RegisterEffect(e1)
 	end
-end
+end--]]

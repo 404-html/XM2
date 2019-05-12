@@ -101,7 +101,7 @@ function c21520188.spoop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c21520188.specon(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
-	return ph==PHASE_END
+	return e:GetHandler():GetType()&(TYPE_SPELL+TYPE_CONTINUOUS)==TYPE_SPELL+TYPE_CONTINUOUS and ph==PHASE_END
 end
 function c21520188.spefilter(c)
 	return c:IsSetCard(0x490) and c:IsAbleToRemove()

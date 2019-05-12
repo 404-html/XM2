@@ -1,15 +1,8 @@
 --幻形魔-昂千德
 function c21520182.initial_effect(c)
 	c:EnableReviveLimit()
---	aux.AddFusionProcFunFunRep(c,aux.FilterBoolFunction(Card.IsFusionSetCard,0x490),aux.FilterBoolFunction(Card.IsRace,RACE_FIEND),2,99,true)
 	--fusion material
-	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_SINGLE)
-	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e0:SetCode(EFFECT_FUSION_MATERIAL)
-	e0:SetCondition(c21520182.fscondition)
-	e0:SetOperation(c21520182.fsoperation)
-	c:RegisterEffect(e0)
+	aux.AddFusionProcMixRep(c,false,false,aux.FilterBoolFunction(Card.IsFusionSetCard,0x490),3,100)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -17,6 +10,17 @@ function c21520182.initial_effect(c)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
 	e1:SetValue(c21520182.splimit)
 	c:RegisterEffect(e1)
+	--cost
+	local e00=Effect.CreateEffect(c)
+	e00:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e00:SetDescription(aux.Stringid(21520182,4))
+	e00:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
+	e00:SetCode(EVENT_PHASE+PHASE_END)
+	e00:SetCountLimit(1)
+	e00:SetRange(LOCATION_MZONE)
+	e00:SetCondition(c21520182.ccon)
+	e00:SetOperation(c21520182.ccost)
+	c:RegisterEffect(e00)
 	--attribute
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
@@ -25,17 +29,7 @@ function c21520182.initial_effect(c)
 	e2:SetCode(EFFECT_ADD_ATTRIBUTE)
 	e2:SetValue(ATTRIBUTE_DARK)
 	c:RegisterEffect(e2)
-	--cost
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e3:SetDescription(aux.Stringid(21520182,4))
-	e3:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
-	e3:SetCode(EVENT_PHASE+PHASE_END)
-	e3:SetCountLimit(1)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetCondition(c21520182.ccon)
-	e3:SetOperation(c21520182.ccost)
-	c:RegisterEffect(e3)
+	
 	--atk def
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
@@ -70,18 +64,6 @@ function c21520182.initial_effect(c)
 	e7:SetTarget(c21520182.drtg)
 	e7:SetOperation(c21520182.drop)
 	c:RegisterEffect(e7)
-end
-function c21520182.fscondition(e,g,gc,chkf)
-	if g==nil then return true end
-	if gc then return false end
-	return g:IsExists(c21520182.sefilter,3,nil)
-end
-function c21520182.fsoperation(e,tp,eg,ep,ev,re,r,rp,gc)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
-	Duel.SetFusionMaterial(eg:FilterSelect(tp,c21520182.sefilter,3,100,nil))
-end
-function c21520182.sefilter(c)
-	return c:IsFusionSetCard(0x490) and c:IsType(TYPE_MONSTER)
 end
 function c21520182.splimit(e,se,sp,st)
 	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
@@ -236,7 +218,7 @@ function c21520182.drcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c21520182.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,1,0,LOCATION_DECK)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,PLAYER_ALL,1)
 end
 function c21520182.drop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetFieldGroup(tp,LOCATION_REMOVED,LOCATION_REMOVED)

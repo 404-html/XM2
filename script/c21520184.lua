@@ -93,7 +93,7 @@ function c21520184.iop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c21520184.bicon(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
-	return ph>=PHASE_BATTLE_START and ph<=PHASE_BATTLE
+	return e:GetHandler():GetType()&(TYPE_SPELL+TYPE_CONTINUOUS)==TYPE_SPELL+TYPE_CONTINUOUS and (ph>=PHASE_BATTLE_START and ph<=PHASE_BATTLE)
 end
 function c21520184.bifilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x490)

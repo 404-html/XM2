@@ -1,5 +1,15 @@
---形魔-菲塞德
+--形魔-彭特贡
 function c21520163.initial_effect(c)
+	--cost
+	local e00=Effect.CreateEffect(c)
+	e00:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e00:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
+	e00:SetCode(EVENT_PHASE+PHASE_END)
+	e00:SetCountLimit(1)
+	e00:SetRange(LOCATION_MZONE)
+	e00:SetCondition(c21520163.ccon)
+	e00:SetOperation(c21520163.ccost)
+	c:RegisterEffect(e00)
 	--Attribute Dark
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -8,16 +18,6 @@ function c21520163.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetValue(ATTRIBUTE_DARK)
 	c:RegisterEffect(e1)
-	--cost
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
-	e2:SetCode(EVENT_PHASE+PHASE_END)
-	e2:SetCountLimit(1)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCondition(c21520163.ccon)
-	e2:SetOperation(c21520163.ccost)
-	c:RegisterEffect(e2)
 	--draw
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(21520163,3))
@@ -39,6 +39,7 @@ end
 function c21520163.ccost(e,tp)
 	if tp~=Duel.GetTurnPlayer() then return end
 	local c=e:GetHandler()
+	Duel.HintSelection(Group.FromCards(c))
 	local g1=Duel.GetMatchingGroup(c21520163.cfilter1,tp,LOCATION_HAND,0,nil)
 	local opselect=2
 	if g1:GetCount()>0 then

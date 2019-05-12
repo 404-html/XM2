@@ -36,9 +36,13 @@ function c21520185.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetCountLimit(1)
+	e3:SetCondition(c21520185.drcon)
 	e3:SetTarget(c21520185.drtg)
 	e3:SetOperation(c21520185.drop)
 	c:RegisterEffect(e3)
+end
+function c21520185.drcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetType()&(TYPE_SPELL+TYPE_CONTINUOUS)==TYPE_SPELL+TYPE_CONTINUOUS
 end
 function c21520185.drtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
@@ -46,7 +50,9 @@ function c21520185.drtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,aux.TRUE,tp,LOCATION_ONFIELD,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,1,0,LOCATION_DECK)
+	Duel.SetTargetPlayer(tp)
+	Duel.SetTargetParam(1)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
 function c21520185.thfilter(c)
 	return c:IsSetCard(0x490) and c:IsAbleToHand()
@@ -54,17 +60,13 @@ end
 function c21520185.drop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
+	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)~=0 then
-		if Duel.Draw(tp,1,REASON_EFFECT)==0 then return end
+		if Duel.Draw(p,d,REASON_EFFECT)==0 then return end
 		local dc=Duel.GetOperatedGroup():GetFirst()
 		Duel.ConfirmCards(1-tp,dc)
-		if dc:IsSetCard(0x490) and Duel.SelectYesNo(tp,aux.Stringid(21520185,1)) then
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-			local g=Duel.SelectMatchingCard(tp,c21520185.thfilter,tp,LOCATION_DECK,0,1,1,nil)
-			if g:GetCount()>0 then
-				Duel.SendtoHand(g,nil,REASON_EFFECT)
-				Duel.ConfirmCards(1-tp,g)
-			end
+		if dc:IsSetCard(0x490) then
+			Duel.Draw(p,1,REASON_EFFECT)
 		end
 		Duel.ShuffleHand(tp)
 	end

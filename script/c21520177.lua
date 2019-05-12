@@ -131,30 +131,8 @@ function c21520177.activate(e,tp,eg,ep,ev,re,r,rp)
 		e4:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e4)
 	end
-	Duel.BreakEffect()
 	local tdg=Duel.GetMatchingGroup(c21520177.tdfilter,tp,LOCATION_MZONE,0,nil)
-	local tdc=tdg:GetFirst()
-	while tdc do
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_DISABLE)
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
-		tdc:RegisterEffect(e1)
-		local e2=Effect.CreateEffect(c)
-		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetCode(EFFECT_DISABLE_EFFECT)
-		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
-		tdc:RegisterEffect(e2)
-		if tdc:IsType(TYPE_TRAPMONSTER) then
-			local e3=Effect.CreateEffect(c)
-			e3:SetType(EFFECT_TYPE_SINGLE)
-			e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
-			e3:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
-			tdc:RegisterEffect(e3)
-		end
-		tdc=tdg:GetNext()
-	end
-	Duel.SendtoDeck(tdg,nil,2,REASON_EFFECT)
+	Duel.SendtoDeck(tdg,nil,2,REASON_RULE)
 end
 function c21520177.rdcon(e,tp,eg,ep,ev,re,r,rp)
 	return ep~=tp

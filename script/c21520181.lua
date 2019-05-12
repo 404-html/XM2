@@ -1,4 +1,4 @@
---几何空间
+--奇形异阵
 function c21520181.initial_effect(c)
 	--active
 	local e1=Effect.CreateEffect(c)
@@ -76,7 +76,7 @@ function c21520181.thop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c21520181.repfilter(c,tp)
 	return c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and c:IsReason(REASON_DESTROY) 
-		and c:IsSetCard(0x490) and c:GetControler()==tp and c:IsLevelBelow(10) and not c:IsType(TYPE_FUSION)
+		and c:IsSetCard(0x490) and c:GetControler()==tp and c:IsLevelBelow(10) and not c:IsType(TYPE_FUSION) and c:GetOriginalCode()~=21520180
 end
 function c21520181.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -97,14 +97,14 @@ function c21520181.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 				reptype=TYPE_TRAP+TYPE_CONTINUOUS 
 				ct=3
 			end
---			tc:CancelToGrave()
 			Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
+			tc:CancelToGrave()
 			local e1=Effect.CreateEffect(tc)
 			e1:SetDescription(aux.Stringid(21520181,ct))
 			e1:SetCode(EFFECT_CHANGE_TYPE)
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
-			e1:SetReset(RESET_EVENT+0x1fc0000)
+			e1:SetReset(RESET_EVENT+0xfc0000)
 --			if tc:IsSetCard(0x5490) then e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
 --			else e1:SetValue(TYPE_TRAP+TYPE_CONTINUOUS) end
 			e1:SetValue(reptype)

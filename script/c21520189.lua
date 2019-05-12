@@ -35,6 +35,7 @@ function c21520189.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetCountLimit(1)
+	e3:SetCondition(c21520189.spcon)
 	e3:SetTarget(c21520189.sptg)
 	e3:SetOperation(c21520189.spop)
 	c:RegisterEffect(e3)
@@ -44,6 +45,9 @@ function c21520189.pfilter(c)
 end
 function c21520189.spfilter(c,e,tp)
 	return c:IsSetCard(0x490) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:IsType(TYPE_MONSTER)
+end
+function c21520189.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetType()&(TYPE_SPELL+TYPE_CONTINUOUS)==TYPE_SPELL+TYPE_CONTINUOUS
 end
 function c21520189.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and c21520189.spfilter(chkc,e,tp) end

@@ -1,5 +1,15 @@
 --等形魔-瑞克坦
 function c21520168.initial_effect(c)
+	--cost
+	local e00=Effect.CreateEffect(c)
+	e00:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e00:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
+	e00:SetCode(EVENT_PHASE+PHASE_END)
+	e00:SetCountLimit(1)
+	e00:SetRange(LOCATION_MZONE)
+	e00:SetCondition(c21520168.ccon)
+	e00:SetOperation(c21520168.ccost)
+	c:RegisterEffect(e00)
 	--change code
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -8,16 +18,6 @@ function c21520168.initial_effect(c)
 	e1:SetRange(LOCATION_ONFIELD+LOCATION_GRAVE)
 	e1:SetValue(21520162)
 	c:RegisterEffect(e1)
-	--cost
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
-	e2:SetCode(EVENT_PHASE+PHASE_END)
-	e2:SetCountLimit(1)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCondition(c21520168.ccon)
-	e2:SetOperation(c21520168.ccost)
-	c:RegisterEffect(e2)
 	--Activate
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
@@ -41,6 +41,7 @@ end
 function c21520168.ccost(e,tp)
 	if tp~=Duel.GetTurnPlayer() then return end
 	local c=e:GetHandler()
+	Duel.HintSelection(Group.FromCards(c))
 	local g1=Duel.GetMatchingGroup(c21520168.cfilter1,tp,LOCATION_HAND,0,nil)
 	local opselect=2
 	if g1:GetCount()>0 then
@@ -94,11 +95,6 @@ function c21520168.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
 	local g=Duel.SelectMatchingCard(tp,c21520168.afilter,tp,LOCATION_HAND,0,1,1,nil)
 	Duel.ConfirmCards(1-tp,g)
-	local e2=Effect.CreateEffect(e:GetHandler())
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_PUBLIC)
-	e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
-	g:GetFirst():RegisterEffect(e2)
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function c21520168.afilter(c)
@@ -129,6 +125,8 @@ function c21520168.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		Duel.Hint(HINT_OPSELECTED,1-tp,aux.Stringid(21520168,4))
 	end
 	if op==1 then
+		Duel.SetTargetPlayer(tp)
+		Duel.SetTargetParam(1)
 		Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,1,tp,1)
 	elseif op==2 then
 		local g=Duel.SelectTarget(tp,c21520168.tohandfilter,tp,LOCATION_GRAVE,0,1,1,e:GetHandler())
@@ -138,7 +136,13 @@ function c21520168.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c21520168.operation(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetLabel()==1 then
-		Duel.Draw(tp,1,REASON_EFFECT)
+		local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+		Duel.Draw(p,d,REASON_EFFECT)
+		local tc=Duel.GetOperatedGroup():GetFirst()
+		Duel.ConfirmCards(1-p,tc)
+		if tc:IsSetCard(0x490) then
+			Duel.Draw(p,1,REASON_EFFECT)
+		end
 	elseif e:GetLabel()==2 then
 		local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 		local sg=g:Filter(Card.IsRelateToEffect,nil,e)

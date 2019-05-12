@@ -10,6 +10,16 @@ function c21520173.initial_effect(c)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
 	e1:SetValue(c21520173.splimit)
 	c:RegisterEffect(e1)
+	--cost
+	local e00=Effect.CreateEffect(c)
+	e00:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e00:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
+	e00:SetCode(EVENT_PHASE+PHASE_END)
+	e00:SetCountLimit(1)
+	e00:SetRange(LOCATION_MZONE)
+	e00:SetCondition(c21520173.ccon)
+	e00:SetOperation(c21520173.ccost)
+	c:RegisterEffect(e00)
 	--attribute
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
@@ -18,16 +28,6 @@ function c21520173.initial_effect(c)
 	e2:SetCode(EFFECT_ADD_ATTRIBUTE)
 	e2:SetValue(ATTRIBUTE_DARK)
 	c:RegisterEffect(e2)
-	--cost
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e3:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
-	e3:SetCode(EVENT_PHASE+PHASE_END)
-	e3:SetCountLimit(1)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetCondition(c21520173.ccon)
-	e3:SetOperation(c21520173.ccost)
-	c:RegisterEffect(e3)
 	--draw
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(21520173,3))
@@ -61,6 +61,7 @@ end
 function c21520173.ccost(e,tp)
 	if tp~=Duel.GetTurnPlayer() then return end
 	local c=e:GetHandler()
+	Duel.HintSelection(Group.FromCards(c))
 	local g1=Duel.GetMatchingGroup(c21520173.cfilter1,tp,LOCATION_HAND,0,nil)
 	local opselect=2
 	if g1:GetCount()>0 then
@@ -94,7 +95,7 @@ function c21520173.ccost(e,tp)
 	end
 end
 function c21520173.fsfilter1(c)
-	return c:IsCode(21520163)
+	return c:IsFusionCode(21520163)
 end
 function c21520173.fsfilter2(c)
 	return c:IsRace(RACE_FIEND)
