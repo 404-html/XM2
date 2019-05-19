@@ -25,7 +25,7 @@ function c10114008.initial_effect(c)
 	e2:SetTarget(c10114008.lvtg)
 	e2:SetOperation(c10114008.lvop)
 	c:RegisterEffect(e2)  
-	--fuck then condition
+	--butterfly then condition
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
